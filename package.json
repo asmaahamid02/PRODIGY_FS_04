@@ -1,0 +1,41 @@
+{
+  "name": "connectify",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon backend-nodejs/dist/server.js",
+    "build": "tsc -p . -w",
+    "lint": "npx eslint backend-nodejs/src"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "@types/eslint__js": "^8.42.3",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.5",
+    "@types/socket.io": "^3.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.5.0",
+    "@typescript-eslint/parser": "^8.5.0",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.10.0",
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.5.0"
+  },
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/mongoose": "^5.11.96",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.2",
+    "socket.io": "^4.7.5"
+  }
+}
