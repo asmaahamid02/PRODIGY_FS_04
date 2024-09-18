@@ -1,7 +1,9 @@
 import express, { Express, Request, Response } from 'express'
 import dotenv from 'dotenv'
 import authRoutes from './routes/auth.route'
+import roomRoutes from './routes/room.route'
 import messageRoutes from './routes/message.route'
+import userRoutes from './routes/user.route'
 import connectToMongoDB from './database/mongodb.database'
 import cookieParser from 'cookie-parser'
 import { IUserBasicInfo } from './types/user.type'
@@ -22,7 +24,9 @@ app.use(express.json()) //To parse incoming requests with Json payload
 app.use(cookieParser()) //To access the cookies in the request
 
 app.use('/api/auth', authRoutes)
+app.use('/api/rooms', roomRoutes)
 app.use('/api/messages', messageRoutes)
+app.use('/api/users', userRoutes)
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from Connectify NodeJs App')

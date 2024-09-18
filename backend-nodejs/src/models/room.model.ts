@@ -19,7 +19,7 @@ const RoomSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-    lastMessageId: {
+    lastMessage: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Message',
     },

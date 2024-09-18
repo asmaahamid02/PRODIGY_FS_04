@@ -1,8 +1,10 @@
 import express, { Router } from 'express'
-import { sendMessage } from '../controllers/message.controller'
+import { getRooms, getRoomMessages } from '../controllers/room.controller'
 import protectRoute from '../middlewares/protectRoute.middleware'
 
 const router: Router = express.Router()
 
-router.post('/send/:receiverId', protectRoute, sendMessage)
+router.get('/', protectRoute, getRooms)
+router.get('/:id', protectRoute, getRoomMessages)
+
 export default router

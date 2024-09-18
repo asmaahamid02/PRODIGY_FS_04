@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import { getErrorMessage } from '../utils/error.util'
 import Room from '../models/room.model'
 import Message from '../models/message.model'
-import { IMessageBody } from '../types/message.type'
 import { validateRequiredFields } from '../utils/validation.util'
 
 export const sendMessage = async (req: Request, res: Response) => {
@@ -17,32 +16,23 @@ export const sendMessage = async (req: Request, res: Response) => {
         .json({ error: validateRequiredFieldsResponse.message })
     }
 
-    const { groupId, receiverId, message }: IMessageBody = req.body
+    const { message }: { message: string } = req.body
     const senderId = req.user?._id
 
-    let room
+    const receiverId = req.params.receiverId
+    if (!receiverId) {
+      return res.status(400).json({ error: 'Receiver Id is required!' })
+    }
 
-    if (groupId) {
-      room = await Room.findOne({
-        _id: groupId,
-        isGroup: true,
-      })
-    } else if (senderId && receiverId) {
-      room = await Room.findOne({
-        participants: { $all: [senderId, receiverId] },
-        isGroup: false,
-      })
+    let room = await Room.findOne({
+      participants: { $all: [senderId, receiverId] },
+    })
 
-      // If room not found, create a new room
-      if (!room) {
-        room = await Room.create({
-          participants: [senderId, receiverId],
-        })
-      }
-    } else {
-      return res
-        .status(400)
-        .json({ error: 'You must provide either groupId or receiverId' })
+    // If room not found, create a new room
+    if (!room) {
+      room = await Room.create({
+        participants: [senderId, receiverId],
+      })
     }
 
     if (!room) {
@@ -51,13 +41,13 @@ export const sendMessage = async (req: Request, res: Response) => {
 
     // Create a new message
     const newMessage = new Message({
-      senderId,
+      sender: senderId,
       message,
-      roomId: room._id,
+      room: room._id,
     })
 
     if (newMessage) {
-      room.lastMessageId = newMessage._id
+      room.lastMessage = newMessage._id
 
       //TODO: Socket.io implementation
 
@@ -68,29 +58,6 @@ export const sendMessage = async (req: Request, res: Response) => {
   } catch (error: unknown) {
     console.log(
       getErrorMessage(error, 'Error in Message Controller - SendMessage API')
-    )
-    return res.status(500).json({ error: 'Internal Server Error!' })
-  }
-}
-
-export const getMessages = async (req: Request, res: Response) => {
-  try {
-    const { roomId } = req.params
-
-    const messages = await Message.find({
-      roomId,
-    })
-      // .populate('senderId', 'name username profilePicture')
-      .sort({ createdAt: 1 })
-
-    if (!messages) {
-      return res.status(200).json([])
-    }
-
-    return res.status(200).json(messages)
-  } catch (error: unknown) {
-    console.log(
-      getErrorMessage(error, 'Error in Message Controller - GetMessages API')
     )
     return res.status(500).json({ error: 'Internal Server Error!' })
   }
