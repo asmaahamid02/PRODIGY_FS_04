@@ -1,10 +1,6 @@
 import { EGender, IUserBody } from '../types/user.type'
 import { Request } from 'express'
-
-// Utility function to check for required fields
-//eslint-disable-next-line
-const checkRequiredFields = (body: any, fields: string[]): string[] =>
-  fields.filter((field) => !body[field])
+import { validateRequiredFields } from './validation.util'
 
 // Utility function to validate username format
 const validateUsername = (
@@ -67,16 +63,16 @@ export const validateSignup: (req: Request) => {
     'gender',
   ]
 
-  const { username, password, confirmPassword, gender }: IUserBody = req.body
+  const validateRequiredFieldsResponse = validateRequiredFields(
+    req.body,
+    requiredFields
+  )
 
-  const missingFields = checkRequiredFields(req.body, requiredFields)
-
-  if (missingFields.length > 0) {
-    return {
-      valid: false,
-      message: `The following fields are required: ${missingFields.join(', ')}`,
-    }
+  if (!validateRequiredFieldsResponse.valid) {
+    return validateRequiredFieldsResponse
   }
+
+  const { username, password, confirmPassword, gender }: IUserBody = req.body
 
   const usernameValidation = validateUsername(username)
   if (!usernameValidation.valid) {

@@ -1,12 +1,12 @@
-import { Request, Response, RequestHandler } from 'express'
+import { Request, Response } from 'express'
 import User from '../models/user.model'
 import { getErrorMessage } from '../utils/error.util'
 import { IUserBody } from '../types/user.type'
-import { validateSignup } from '../utils/auth-validation.util'
+import { validateSignup } from '../utils/authValidation.util'
 import bcrypt from 'bcryptjs'
-import createToken from '../utils/jwt.util'
+import { createToken, clearToken } from '../utils/jwt.util'
 
-export const signup: RequestHandler = async (req: Request, res: Response) => {
+export const signup = async (req: Request, res: Response) => {
   try {
     const { fullName, username, password, gender }: IUserBody = req.body
 
@@ -52,6 +52,7 @@ export const signup: RequestHandler = async (req: Request, res: Response) => {
         username: newUser.username,
         profilePicture: newUser.profilePicture,
         gender: newUser.gender,
+        createdAt: newUser.createdAt,
       })
     }
 
@@ -85,6 +86,7 @@ export const login = async (req: Request, res: Response) => {
       username: user.username,
       profilePicture: user.profilePicture,
       gender: user.gender,
+      createdAt: user.createdAt,
     })
   } catch (error: unknown) {
     console.log(getErrorMessage(error, 'Error in Auth Controller - Login API'))
@@ -93,9 +95,7 @@ export const login = async (req: Request, res: Response) => {
 }
 export const logout = (req: Request, res: Response) => {
   try {
-    res.cookie('jwt', '', {
-      maxAge: 0,
-    })
+    clearToken(res)
 
     res.status(200).json({ message: 'Logout successfully!' })
   } catch (error: unknown) {

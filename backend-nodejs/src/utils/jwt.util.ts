@@ -17,4 +17,10 @@ const createToken = (payload: ITokenPayload, res: Response) => {
   })
 }
 
-export default createToken
+const clearToken = (res: Response) => {
+  res.cookie('jwt', '', {
+    maxAge: 0,
+    httpOnly: true,
+  })
+}
+export { createToken, clearToken }
