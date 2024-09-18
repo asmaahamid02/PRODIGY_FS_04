@@ -21,15 +21,12 @@ export const sendMessage = async (req: Request, res: Response) => {
     const senderId = req.user?._id
 
     let room
-    let isGroupMessage = false
 
     if (groupId) {
       room = await Room.findOne({
         _id: groupId,
         isGroup: true,
       })
-
-      isGroupMessage = true
     } else if (senderId && receiverId) {
       room = await Room.findOne({
         participants: { $all: [senderId, receiverId] },
@@ -56,11 +53,11 @@ export const sendMessage = async (req: Request, res: Response) => {
     const newMessage = new Message({
       senderId,
       message,
-      ...(isGroupMessage ? { groupId } : { receiverId }),
+      roomId: room._id,
     })
 
     if (newMessage) {
-      room.messages.push(newMessage._id)
+      room.lastMessageId = newMessage._id
 
       //TODO: Socket.io implementation
 
@@ -79,18 +76,18 @@ export const sendMessage = async (req: Request, res: Response) => {
 export const getMessages = async (req: Request, res: Response) => {
   try {
     const { roomId } = req.params
-    const currentUserId = req.user?._id
 
-    const room = await Room.findOne({
-      _id: roomId,
-      participants: currentUserId,
-    }).populate('messages')
+    const messages = await Message.find({
+      roomId,
+    })
+      // .populate('senderId', 'name username profilePicture')
+      .sort({ createdAt: 1 })
 
-    if (!room) {
+    if (!messages) {
       return res.status(200).json([])
     }
 
-    return res.status(200).json(room.messages)
+    return res.status(200).json(messages)
   } catch (error: unknown) {
     console.log(
       getErrorMessage(error, 'Error in Message Controller - GetMessages API')

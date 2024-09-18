@@ -8,20 +8,20 @@ const RoomSchema = new mongoose.Schema(
         ref: 'User',
       },
     ],
-    messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Message',
-        default: [],
-      },
-    ],
     isGroup: {
       type: Boolean,
       default: false,
     },
     groupName: {
       type: String,
-      default: '',
+    },
+    groupAdmin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    lastMessageId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Message',
     },
   },
   { timestamps: true }
