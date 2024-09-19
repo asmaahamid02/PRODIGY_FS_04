@@ -20,4 +20,5 @@ export interface IUserBasicInfo {
   gender: string
   profilePicture: string
   createdAt: NativeDate
+  token?: string
 }

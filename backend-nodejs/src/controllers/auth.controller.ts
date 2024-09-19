@@ -42,7 +42,10 @@ export const signup = async (req: Request, res: Response) => {
 
     if (newUser) {
       //generate JWT token
-      createToken({ userId: newUser._id, username: newUser.username }, res)
+      const token = createToken(
+        { userId: newUser._id, username: newUser.username },
+        res
+      )
 
       await newUser.save()
 
@@ -53,6 +56,7 @@ export const signup = async (req: Request, res: Response) => {
         profilePicture: newUser.profilePicture,
         gender: newUser.gender,
         createdAt: newUser.createdAt,
+        token,
       })
     }
 
@@ -78,7 +82,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid credentials!' })
     }
 
-    createToken({ userId: user._id, username }, res)
+    const token = createToken({ userId: user._id, username }, res)
 
     res.status(200).json({
       _id: user._id,
@@ -87,6 +91,7 @@ export const login = async (req: Request, res: Response) => {
       profilePicture: user.profilePicture,
       gender: user.gender,
       createdAt: user.createdAt,
+      token,
     })
   } catch (error: unknown) {
     console.log(getErrorMessage(error, 'Error in Auth Controller - Login API'))

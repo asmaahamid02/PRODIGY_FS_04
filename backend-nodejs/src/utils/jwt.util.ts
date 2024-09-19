@@ -15,6 +15,8 @@ const createToken = (payload: ITokenPayload, res: Response) => {
     sameSite: 'strict', //CSRF attacks (cross-site request forgery attacks)
     secure: process.env.NODE_ENV === 'production', //HTTPS only in production
   })
+
+  return token
 }
 
 const clearToken = (res: Response) => {
