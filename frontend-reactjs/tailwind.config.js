@@ -9,8 +9,5 @@ export default {
   plugins: [daisyui],
   //set the mode to be light temporarily
   darkMode: 'class',
-
-  daisyui: {
-    darkTheme: false,
-  },
+  daisyui: {},
 }
