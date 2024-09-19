@@ -1,9 +1,11 @@
-import AuthPage from './pages/AuthPage'
+import { Toaster } from 'react-hot-toast'
+import MainRoutes from './routes/Routes'
 
 function App() {
   return (
-    <div className='p-4 h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950'>
-      <AuthPage />
+    <div className='min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950'>
+      <MainRoutes />
+      <Toaster position='bottom-center' />
     </div>
   )
 }

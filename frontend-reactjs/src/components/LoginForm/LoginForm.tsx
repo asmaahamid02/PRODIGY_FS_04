@@ -4,7 +4,8 @@ import * as Yup from 'yup'
 import TextInput from '../inputs/TextInput'
 import { FaKey, FaUser } from 'react-icons/fa'
 import PasswordAdornment from '../utils/PasswordAdornment'
-import { ILoginFormValues } from './types'
+import { ILoginFormValues } from '../../types/login.type'
+import useLogin from '../../hooks/useLogin'
 
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),
@@ -14,18 +15,20 @@ const loginValidationSchema = Yup.object().shape({
 const LoginForm = () => {
   const { visible: showPassword, toggle: togglePassword } =
     usePasswordVisibility()
+  const { loading, login } = useLogin()
 
   const initialValues: ILoginFormValues = {
     username: '',
     password: '',
   }
 
-  const onSubmit = (
+  const onSubmit = async (
     values: ILoginFormValues,
     actions: FormikHelpers<ILoginFormValues>
   ) => {
-    console.log(values)
+    await login(values)
     actions.setSubmitting(false)
+    actions.resetForm()
   }
 
   return (
@@ -51,7 +54,11 @@ const LoginForm = () => {
           }
         />
         <button type='submit' className='btn btn-accent w-full sm:text-lg'>
-          Login
+          {loading ? (
+            <span className='loading loading-spinner loading-md'></span>
+          ) : (
+            'Login'
+          )}
         </button>
       </Form>
     </Formik>

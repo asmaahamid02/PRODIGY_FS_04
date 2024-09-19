@@ -1,14 +1,11 @@
-export enum EGender {
-  Male = 'male',
-  Female = 'female',
-}
+import { EGender } from './user.type'
 
 export interface ISignupFormValues {
   fullName?: string
   username: string
   password: string
-  confirmPassword?: string
-  gender?: EGender
+  confirmPassword: string
+  gender: EGender
 
   profilePicture?: File | null
 }

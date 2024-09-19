@@ -4,7 +4,9 @@ import * as Yup from 'yup'
 import TextInput from '../inputs/TextInput'
 import { FaKey, FaUser } from 'react-icons/fa'
 import PasswordAdornment from '../utils/PasswordAdornment'
-import { EGender, ISignupFormValues } from './types'
+import { ISignupFormValues } from '../../types/signup.type'
+import useSignup from '../../hooks/useSignup'
+import { EGender } from '../../types/user.type'
 
 const signupValidationSchema = Yup.object().shape({
   fullName: Yup.string().required('Full name is required'),
@@ -29,11 +31,12 @@ const signupValidationSchema = Yup.object().shape({
     .oneOf([Yup.ref('password')], 'Passwords must match'),
 })
 
-const LoginForm = () => {
+const SignupForm = () => {
   const { visible: showPassword, toggle: togglePassword } =
     usePasswordVisibility()
   const { visible: showConfirmPassword, toggle: toggleConfirmPassword } =
     usePasswordVisibility()
+  const { loading, signup } = useSignup()
 
   const initialValues: ISignupFormValues = {
     fullName: '',
@@ -44,12 +47,13 @@ const LoginForm = () => {
     profilePicture: null,
   }
 
-  const onSubmit = (
+  const onSubmit = async (
     values: ISignupFormValues,
     actions: FormikHelpers<ISignupFormValues>
   ) => {
-    console.log(values)
+    await signup(values)
     actions.setSubmitting(false)
+    actions.resetForm()
   }
 
   return (
@@ -58,7 +62,7 @@ const LoginForm = () => {
       validationSchema={signupValidationSchema}
       onSubmit={onSubmit}
     >
-      {({ setFieldValue }) => (
+      {({ setFieldValue, isSubmitting }) => (
         <Form className='space-y-4'>
           <TextInput
             type='text'
@@ -118,8 +122,16 @@ const LoginForm = () => {
               }
             />
           </label>
-          <button type='submit' className='btn btn-accent w-full sm:text-lg'>
-            Signup
+          <button
+            type='submit'
+            className='btn btn-accent w-full sm:text-lg'
+            disabled={loading || isSubmitting}
+          >
+            {loading ? (
+              <span className='loading loading-spinner loading-md'></span>
+            ) : (
+              'Signup'
+            )}
           </button>
         </Form>
       )}
@@ -127,4 +139,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default SignupForm
