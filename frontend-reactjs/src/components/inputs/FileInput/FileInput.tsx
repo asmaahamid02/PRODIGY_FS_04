@@ -1,31 +1,23 @@
-import { useField } from 'formik'
-import { FC } from 'react'
+import { ChangeEvent, FC } from 'react'
 
 interface IFileInputProps {
   name: string
-
-  // Optional
+  label: string
+  accept?: string
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void
 }
 
 const FileInput: FC<IFileInputProps> = (props) => {
-  const [field, meta] = useField(props)
-
   return (
-    <label className='form-control w-full '>
+    <label className='form-control w-full'>
       <div className='label'>
         <span className='label-text'>Profile picture</span>
       </div>
       <input
         type='file'
-        {...field}
+        className='file-input file-input-bordered w-full'
         {...props}
-        className='file-input file-input-bordered w-full dark:bg-gray-900'
       />
-      {meta.touched && Boolean(meta.error) && (
-        <div className='label'>
-          <span className='label-text-alt text-red-500'>{meta.error}</span>
-        </div>
-      )}
     </label>
   )
 }

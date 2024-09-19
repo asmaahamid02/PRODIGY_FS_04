@@ -7,6 +7,7 @@ import PasswordAdornment from '../utils/PasswordAdornment'
 import { ISignupFormValues } from '../../types/signup.type'
 import useSignup from '../../hooks/useSignup'
 import { EGender } from '../../types/user.type'
+import FileInput from '../inputs/FileInput'
 
 const signupValidationSchema = Yup.object().shape({
   fullName: Yup.string().required('Full name is required'),
@@ -105,23 +106,19 @@ const SignupForm = () => {
               />
             }
           />
-          <label className='form-control w-full '>
-            <div className='label'>
-              <span className='label-text'>Profile picture</span>
-            </div>
-            <input
-              type='file'
-              name='profilePicture'
-              className='file-input file-input-bordered w-full dark:bg-gray-900'
-              accept='image/*'
-              onChange={(e) =>
-                setFieldValue(
-                  'profilePicture',
-                  e.currentTarget.files?.[0] || null
-                )
-              }
-            />
-          </label>
+
+          <FileInput
+            name='profilePicture'
+            accept='image/*'
+            label='Profile picture'
+            onChange={(e) =>
+              setFieldValue(
+                'profilePicture',
+                e.currentTarget.files?.[0] || null
+              )
+            }
+          />
+
           <button
             type='submit'
             className='btn btn-accent w-full sm:text-lg'

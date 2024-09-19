@@ -2,7 +2,7 @@ import ThemeSwitcher from '../../inputs/ThemeSwitcher'
 
 const AuthNavbar = () => {
   return (
-    <div className='navbar bg-primary text-primary-content px-4'>
+    <div className='shrink-0 navbar bg-base-100 px-4'>
       <div className='flex-1'>
         <a className='btn btn-ghost text-xl'>Connectify</a>
       </div>

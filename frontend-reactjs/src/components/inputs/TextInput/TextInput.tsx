@@ -16,7 +16,7 @@ const TextInput: FC<ITextInputProps> = ({ prefix, suffix, ...props }) => {
 
   return (
     <label className='form-control w-full'>
-      <label className='input input-bordered flex items-center gap-2 dark:bg-gray-900'>
+      <label className='input input-bordered flex items-center gap-2'>
         {prefix}
         <input {...field} {...props} className='grow' />
         {suffix}
