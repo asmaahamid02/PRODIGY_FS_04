@@ -1,0 +1,40 @@
+import React, { FC } from 'react'
+import { IoMdClose } from 'react-icons/io'
+import { IoSearch } from 'react-icons/io5'
+
+interface ISearchInputProps {
+  searchQuery: string
+  handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void
+  clearSearch: () => void
+}
+
+const SearchInput: FC<ISearchInputProps> = ({
+  searchQuery,
+  handleSearch,
+  clearSearch,
+}) => {
+  return (
+    <label className='input input-bordered flex items-center gap-2 rounded-full'>
+      <input
+        type='text'
+        className='grow'
+        placeholder='Search chat..'
+        value={searchQuery}
+        onChange={handleSearch}
+      />
+      {searchQuery ? (
+        <button
+          className='tooltip tooltip-bottom'
+          data-tip='Clear'
+          onClick={clearSearch}
+        >
+          <IoMdClose />
+        </button>
+      ) : (
+        <IoSearch />
+      )}
+    </label>
+  )
+}
+
+export default SearchInput

@@ -6,17 +6,17 @@ type IProps = {
   children?: ReactNode
 }
 
-type IAuthContext = {
+type TAuthContext = {
   authUser: IUser | null
   setAuthUser: (newState: IUser | null) => void
 }
 
-const initialValues: IAuthContext = {
+const initialValues: TAuthContext = {
   authUser: null,
   setAuthUser: () => {},
 }
 
-export const AuthContext = createContext<IAuthContext>(initialValues)
+export const AuthContext = createContext<TAuthContext>(initialValues)
 
 export const AuthContextProvider = ({ children }: IProps) => {
   const [authUser, setAuthUser] = useState(

@@ -1,0 +1,10 @@
+.tooltip-bottom::before {
+  left: 0;
+  transform: translateX(0);
+}
+
+.tooltip-bottom {
+  left: 0;
+  transform: translateX(0);
+  z-index: 1;
+}

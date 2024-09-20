@@ -9,7 +9,7 @@ export interface IUser {
   username: string
   gender: string
   profilePicture: string
-  createdAt: Date
+  createdAt: string
   token?: string
 }
 
