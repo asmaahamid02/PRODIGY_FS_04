@@ -69,3 +69,54 @@ export const getRoomMessages = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Internal Server Error!' })
   }
 }
+
+export const getRoom = async (req: Request, res: Response) => {
+  try {
+    const { receiverId } = req.params
+    const currentUser = req.user
+
+    if (!receiverId) {
+      return res.status(400).json({ error: 'receiverId is required!' })
+    }
+
+    const receiver = await User.findById(receiverId)
+
+    if (!receiver) {
+      return res.status(404).json({ error: 'User not found!' })
+    }
+
+    const fakeRoom = {
+      _id: new Date().getTime().toString(),
+      participants: [currentUser, receiver],
+      lastMessage: null,
+      isGroup: false,
+      isFake: true,
+    }
+
+    //eslint-disable-next-line
+    let room: any = await Room.findOne({
+      participants: receiverId,
+    })
+      .populate('participants', '-password')
+      .populate('groupAdmin', '-password')
+      .populate('lastMessage')
+
+    if (!room) {
+      //return fake room
+      return res.status(200).json(fakeRoom)
+    }
+
+    //populate the last message sender
+    room = await User.populate(room, {
+      path: 'lastMessage.sender',
+      select: '-password',
+    })
+
+    return res.status(200).json(room)
+  } catch (error: unknown) {
+    console.log(
+      getErrorMessage(error, 'Error in Room Controller - getRoom API')
+    )
+    return res.status(500).json({ error: 'Internal Server Error!' })
+  }
+}

@@ -40,19 +40,26 @@ export const sendMessage = async (req: Request, res: Response) => {
     }
 
     // Create a new message
-    const newMessage = new Message({
+    let newMessage = await Message.create({
       sender: senderId,
       message,
       room: room._id,
     })
 
-    if (newMessage) {
-      room.lastMessage = newMessage._id
-
-      //TODO: Socket.io implementation
-
-      await Promise.all([newMessage.save(), room.save()])
+    if (!newMessage) {
+      return res.status(500).json({ error: 'Failed to send message!' })
     }
+
+    //populate the sender
+    newMessage = await newMessage.populate('sender', '-password')
+    newMessage = await newMessage.populate('room')
+    newMessage = await newMessage.populate('room.participants', '-password')
+
+    room.lastMessage = newMessage._id
+    room.updatedAt = new Date()
+    await room.save()
+
+    //TODO: Socket.io implementation
 
     return res.status(201).json(newMessage)
   } catch (error: unknown) {
