@@ -7,6 +7,7 @@ import { useChatContext } from '../../../hooks/useChatContext'
 import { IRoom } from '../../../types/chat.type'
 import { useModalContext } from '../../../hooks/useModalContext'
 import Spinner from '../../utils/Spinner'
+import Avatar from '../../Avatar'
 
 interface UserItemProps {
   user: IUser
@@ -36,11 +37,8 @@ const UserItem: FC<UserItemProps> = ({ user }) => {
     >
       <div className='flex items-center space-x-2'>
         {/* AVATAR */}
-        <div className='avatar'>
-          <div className='w-10 md:w-12 rounded-full'>
-            <img src={user.profilePicture} alt={user.fullName} />
-          </div>
-        </div>
+        <Avatar src={user.profilePicture} alt={user.fullName} />
+
         <div>
           <h4 className='md:text-lg font-bold'>{user.fullName}</h4>
           <p className='text-sm'>{user.username}</p>

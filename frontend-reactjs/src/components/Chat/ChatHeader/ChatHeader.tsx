@@ -2,6 +2,7 @@ import { useChatContext } from '../../../hooks/useChatContext'
 import useRoomInfo from '../../../hooks/useRoomInfo'
 import { IRoom } from '../../../types/chat.type'
 import { FaArrowLeft, FaEye } from 'react-icons/fa'
+import Avatar from '../../Avatar'
 
 const ChatHeader = () => {
   const { selectedRoom } = useChatContext()
@@ -20,12 +21,16 @@ const ChatHeader = () => {
 
       <div className='flex-1 flex items-center space-x-2'>
         {/* AVATAR */}
-        <div className='avatar online'>
-          <div className='w-10 md:w-12 rounded-full'>
-            <img src={profilePicture} alt={chatName} />
-          </div>
+        <Avatar
+          src={profilePicture as string}
+          alt={chatName as string}
+          width='w-10 md:w-12'
+          isOnline={true}
+        />
+        <div className='flex-1'>
+          <h2 className='text-lg md:text-xl font-bold'>{chatName}</h2>
+          <p className='text-sm text-base-400'>Typing...</p>
         </div>
-        <h2 className='text-lg md:text-xl font-bold'>{chatName}</h2>
       </div>
 
       {/* VIEW PROFILE BUTTON */}

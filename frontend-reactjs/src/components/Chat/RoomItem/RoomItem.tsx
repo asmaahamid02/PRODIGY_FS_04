@@ -2,6 +2,7 @@ import { FC } from 'react'
 import { useChatContext } from '../../../hooks/useChatContext'
 import { IRoom } from '../../../types/chat.type'
 import useRoomInfo from '../../../hooks/useRoomInfo'
+import Avatar from '../../Avatar'
 interface IRoomItemProps {
   room: IRoom
 }
@@ -26,11 +27,12 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
     >
       <div className='flex items-center space-x-2 max-w-[75%]'>
         {/* AVATAR */}
-        <div className='avatar online'>
-          <div className='w-10 md:w-12 rounded-full'>
-            <img src={profilePicture} alt={chatName} />
-          </div>
-        </div>
+        <Avatar
+          src={profilePicture as string}
+          alt={chatName as string}
+          isOnline={true}
+        />
+
         <div className='flex-1 overflow-hidden'>
           <h4 className='md:text-lg font-bold truncate'>{chatName}</h4>
           <p className='text-sm truncate'>
