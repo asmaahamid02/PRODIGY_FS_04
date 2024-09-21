@@ -67,7 +67,7 @@ const HomeNavbar = () => {
           >
             <li>
               <a className='justify-between'>
-                Profile
+                {authUser?.fullName}
                 {isNew && <span className='badge'>New</span>}
               </a>
             </li>

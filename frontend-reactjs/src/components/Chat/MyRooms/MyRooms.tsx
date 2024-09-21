@@ -5,16 +5,13 @@ import NewChatModal from '../../modals/NewChatModal'
 import useGetRooms from '../../../hooks/useGetRooms'
 import { useChatContext } from '../../../hooks/useChatContext'
 import SearchInput from '../../inputs/SearchInput'
+import { useModalContext } from '../../../hooks/useModalContext'
 
 const MyRooms = () => {
-  const { selectedRoom } = useChatContext()
-  const modalRef = useRef<HTMLDialogElement>(null)
-  const { loading, rooms } = useGetRooms()
+  const { selectedRoom, rooms } = useChatContext()
+  const { modalRef, openModal } = useModalContext()
+  const { loading } = useGetRooms()
   const [searchQuery, setSearchQuery] = useState('')
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-  }
 
   const filteredRooms = useMemo(() => {
     if (!searchQuery) return rooms
@@ -33,6 +30,10 @@ const MyRooms = () => {
       )
     })
   }, [rooms, searchQuery])
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }
 
   const clearSearch = () => {
     setSearchQuery('')
@@ -54,7 +55,7 @@ const MyRooms = () => {
           <div className='flex items-center justify-between'>
             <h1 className='text-lg md:text-xl font-bold'>My Chats</h1>
             <button
-              onClick={() => modalRef.current?.showModal()}
+              onClick={openModal}
               className='btn btn-circle btn-xs btn-primary'
             >
               <FaPlus />

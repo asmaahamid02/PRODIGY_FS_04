@@ -7,12 +7,13 @@ export interface IRoom {
   groupName?: string
   groupAdmin?: IUser
   lastMessage: IMessage | null
+  isFake?: boolean
 }
 
 export interface IMessage {
   _id: string
   sender: IUser
-  room: string
+  room: string | IRoom
   message: string
   createdAt: string
   updatedAt: string

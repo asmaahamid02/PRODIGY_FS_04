@@ -1,6 +1,7 @@
 .tooltip-bottom::before {
   left: 0;
   transform: translateX(0);
+  margin: 0 0 1.5rem 1.5rem;
 }
 
 .tooltip-bottom {

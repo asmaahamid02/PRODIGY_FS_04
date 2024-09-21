@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
   LOGOUT: '/auth/logout',
   ROOMS: 'rooms',
   USERS: 'users',
+  MESSAGES: 'messages',
 }
 
 export const STORED_USER_KEY = 'connectify-user'

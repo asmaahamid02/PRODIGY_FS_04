@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { IRoom } from '../types/chat.type'
 import { handleError } from '../utils/error.util'
 import { getRoomsService } from '../services/room.service'
+import { useChatContext } from './useChatContext'
 
 const useGetRooms = () => {
   const [loading, setLoading] = useState(false)
-  const [rooms, setRooms] = useState<IRoom[]>([])
+  const { setRooms } = useChatContext()
 
   useEffect(() => {
     const getRooms = async () => {
@@ -23,9 +24,9 @@ const useGetRooms = () => {
     }
 
     getRooms()
-  }, [])
+  }, [setRooms])
 
-  return { loading, rooms }
+  return { loading }
 }
 
 export default useGetRooms
