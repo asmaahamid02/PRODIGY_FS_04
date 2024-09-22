@@ -15,7 +15,7 @@ const ChatBox = () => {
     <div
       className={`${
         selectedRoom ? 'flex' : 'hidden'
-      } md:flex flex-col items-center bg-base-100 w-full rounded-lg`}
+      } md:flex flex-col items-center bg-base-100 w-full h-full rounded-lg`}
     >
       {selectedRoom ? (
         <>

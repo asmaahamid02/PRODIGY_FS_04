@@ -7,6 +7,7 @@ import {
   isToday,
   isYesterday,
 } from '../utils/date.util'
+import { useSocketContext } from './useSocketContext'
 
 interface IRoomInfoProps {
   room: IRoom
@@ -15,6 +16,7 @@ interface IRoomInfoProps {
 const useRoomInfo = ({ room }: IRoomInfoProps) => {
   const { selectedRoom } = useChatContext()
   const { authUser } = useAuthContext()
+  const { onlineUsers, typing, typingInfo } = useSocketContext()
 
   const isGroup = room?.isGroup
   const sender = isGroup
@@ -38,13 +40,25 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
     : sender?.profilePicture
   const isSelected = selectedRoom?._id === room?._id
 
+  //search among the participants of the room
+  const isOnline = onlineUsers.includes(sender?._id as string)
+
+  //get typing user
+  const typingUser = isGroup
+    ? room.participants.find((user) => user._id === typingInfo?.userId)
+    : null
+
   return {
     sender,
     chatName,
+    isGroup,
     lastMessageText,
     lastMessageTime,
     profilePicture,
     isSelected,
+    isOnline,
+    typing: typing && typingInfo?.roomId === room._id,
+    typingUser,
   }
 }
 

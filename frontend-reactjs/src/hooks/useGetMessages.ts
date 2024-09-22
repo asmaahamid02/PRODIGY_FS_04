@@ -1,3 +1,4 @@
+import { useSocketContext } from './useSocketContext'
 import { useEffect, useState } from 'react'
 import { useChatContext } from './useChatContext'
 import { getMessagesService } from '../services/room.service'
@@ -5,6 +6,7 @@ import { getMessagesService } from '../services/room.service'
 const useGetMessages = () => {
   const [loading, setLoading] = useState(false)
   const { selectedRoom, setMessages } = useChatContext()
+  const { socket } = useSocketContext()
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -18,6 +20,8 @@ const useGetMessages = () => {
         }
 
         setMessages(response)
+
+        socket?.emit('joinRoom', selectedRoom?._id)
       } catch (error: unknown) {
         console.log(error)
       } finally {
@@ -32,7 +36,7 @@ const useGetMessages = () => {
         fetchMessages()
       }
     }
-  }, [selectedRoom, setMessages])
+  }, [selectedRoom, setMessages, socket])
 
   return { loading }
 }

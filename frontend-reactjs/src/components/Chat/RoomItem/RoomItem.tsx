@@ -3,6 +3,7 @@ import { useChatContext } from '../../../hooks/useChatContext'
 import { IRoom } from '../../../types/chat.type'
 import useRoomInfo from '../../../hooks/useRoomInfo'
 import Avatar from '../../Avatar'
+import { useSocketContext } from '../../../hooks/useSocketContext'
 interface IRoomItemProps {
   room: IRoom
 }
@@ -15,6 +16,9 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
     lastMessageText,
     lastMessageTime,
     isSelected,
+    isOnline,
+    typing,
+    typingUser,
   } = useRoomInfo({ room })
 
   return (
@@ -30,16 +34,23 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
         <Avatar
           src={profilePicture as string}
           alt={chatName as string}
-          isOnline={true}
+          isOnline={isOnline}
         />
 
         <div className='flex-1 overflow-hidden'>
           <h4 className='md:text-lg font-bold truncate'>{chatName}</h4>
-          <p className='text-sm truncate'>
-            {lastMessageText.length > 50
-              ? lastMessageText.substring(0, 51)
-              : lastMessageText}
-          </p>
+          {typing ? (
+            <p className='text-sm text-base-400 flex items-center gap-1 text-accent'>
+              {typingUser && `${typingUser.fullName} is`} typing
+              <span className='loading loading-dots loading-sm'></span>
+            </p>
+          ) : (
+            <p className='text-sm truncate'>
+              {lastMessageText.length > 50
+                ? lastMessageText.substring(0, 51)
+                : lastMessageText}
+            </p>
+          )}
         </div>
       </div>
       <div className='space-y-2 flex flex-col items-end'>

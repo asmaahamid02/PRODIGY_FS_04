@@ -24,7 +24,10 @@ const UserItem: FC<UserItemProps> = ({ user }) => {
   const handleUserClick = async () => {
     if (loading) return
 
+    console.log(user._id)
+
     const room = await getRoom(user._id)
+    console.log(room)
     setSelectedRoom(room as IRoom)
     closeModal()
   }

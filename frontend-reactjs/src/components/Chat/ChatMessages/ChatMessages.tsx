@@ -30,8 +30,8 @@ const ChatMessages = () => {
   return (
     <>
       {formattedMessages.length > 0 ? (
-        <div className='flex-1 flex flex-col justify-end h-full w-full p-4'>
-          <ScrollableFeed>
+        <div className='flex-1 overflow-y-auto flex justify-end w-full p-4'>
+          <ScrollableFeed className='w-full' forceScroll={true}>
             {formattedMessages.map((message) => {
               return <ChatBubble message={message} key={message._id} />
             })}

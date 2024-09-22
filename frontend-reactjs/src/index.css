@@ -2,15 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-.html {
+html {
   height: 100%;
 }
 
-.body {
+body {
   height: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
   display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/*Change scrollbar style*/
+* {
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
 }

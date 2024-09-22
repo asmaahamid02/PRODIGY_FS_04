@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FaPlus } from 'react-icons/fa'
 import RoomItem from '../RoomItem'
 import NewChatModal from '../../modals/NewChatModal'
@@ -84,7 +84,7 @@ const MyRooms = () => {
                   ))}
                 </>
               ) : (
-                <p className='w-full text-center pt-2'>No chats found!</p>
+                <p className='w-full text-center pt-2'>No chats yet!</p>
               )}
             </>
           )}

@@ -13,11 +13,7 @@ interface IChatBubbleProps {
 
 const ChatBubble: FC<IChatBubbleProps> = ({ message }) => {
   return (
-    <div
-      className={`chat ${message.isMe ? 'chat-end' : 'chat-start'} ${
-        message.isSameSender ? 'pl-auto' : 'pl-10'
-      }`}
-    >
+    <div className={`chat ${message.isMe ? 'chat-end' : 'chat-start'}`}>
       {/* AVATAR */}
       {(message.isSameSender || message.isLastMessage) && (
         <div
@@ -36,7 +32,17 @@ const ChatBubble: FC<IChatBubbleProps> = ({ message }) => {
       )}
 
       {/* MESSAGE */}
-      <div className='chat-bubble'>{message.message}</div>
+      <div
+        className={`chat-bubble bg-gray-200 dark:bg-gray-700 text-base-content
+        ${
+          !message.isMe && !message.isSameSender && !message.isLastMessage
+            ? 'ml-10'
+            : ''
+        }
+        `}
+      >
+        {message.message}
+      </div>
 
       {/* TIME */}
       <div className='chat-footer opacity-50'>

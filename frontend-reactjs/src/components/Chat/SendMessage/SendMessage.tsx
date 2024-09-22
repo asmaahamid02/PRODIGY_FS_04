@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { FiImage } from 'react-icons/fi'
 import { IoSend } from 'react-icons/io5'
 import useSendMessage from '../../../hooks/useSendMessage'
@@ -6,18 +6,37 @@ import useRoomInfo from '../../../hooks/useRoomInfo'
 import { useChatContext } from '../../../hooks/useChatContext'
 import { IRoom } from '../../../types/chat.type'
 import Spinner from '../../utils/Spinner'
+import { useSocketContext } from '../../../hooks/useSocketContext'
 
 const SendMessage = () => {
   const [message, setMessage] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
   const { selectedRoom } = useChatContext()
   const { loading, sendMessage } = useSendMessage()
   const { sender } = useRoomInfo({ room: selectedRoom as IRoom })
+  const { socket } = useSocketContext()
 
   const handleSendMessage = async () => {
     if (message.trim() === '') return
 
     await sendMessage(sender?._id as string, message)
     setMessage('')
+  }
+
+  const handleTyping = (e: ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value)
+
+    if (!isTyping) {
+      console.log('typing')
+      setIsTyping(true)
+
+      socket?.emit('typing', selectedRoom)
+
+      setTimeout(() => {
+        socket?.emit('stopTyping', selectedRoom)
+        setIsTyping(false)
+      }, 3000)
+    }
   }
 
   return (
@@ -31,7 +50,7 @@ const SendMessage = () => {
         placeholder='Type here'
         className='input input-ghost flex-1 focus:border-none focus:ring-0 focus:outline-none'
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleTyping}
       />
       {loading ? (
         <Spinner size='' />
