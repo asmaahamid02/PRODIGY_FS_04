@@ -4,9 +4,11 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon backend-nodejs/dist/server.js",
-    "build": "tsc -p . -w",
-    "lint": "npx eslint backend-nodejs/src"
+    "dev": "nodemon backend-nodejs/dist/server.js",
+    "lint": "npx eslint backend-nodejs/src",
+    "start": "node backend-nodejs/dist/server.js",
+    "build-ts": "tsc -p . -w",
+    "build": "npm install && tsc -p . && npm install --prefix frontend-reactjs && npm run build --prefix frontend-reactjs"
   },
   "author": "",
   "license": "ISC",

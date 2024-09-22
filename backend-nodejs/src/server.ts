@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express'
+import express, { Request, Response } from 'express'
 import dotenv from 'dotenv'
 import authRoutes from './routes/auth.route'
 import roomRoutes from './routes/room.route'
@@ -9,10 +9,13 @@ import cookieParser from 'cookie-parser'
 import { IUserBasicInfo } from './types/user.type'
 import cors from 'cors'
 import { app, server } from './socket'
+import path from 'path'
 
 dotenv.config()
 
 const port = process.env.PORT || 8000
+
+const BASEDIR = path.resolve()
 
 //add user property to Request interface
 declare module 'express-serve-static-core' {
@@ -34,8 +37,10 @@ app.use('/api/rooms', roomRoutes)
 app.use('/api/messages', messageRoutes)
 app.use('/api/users', userRoutes)
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello from Connectify NodeJs App')
+app.use(express.static(path.join(BASEDIR, '/frontend-reactjs/dist')))
+
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(BASEDIR, 'frontend-reactjs', 'dist', 'index.html'))
 })
 
 server.listen(port, () => {
