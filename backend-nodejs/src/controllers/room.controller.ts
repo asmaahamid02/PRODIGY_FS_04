@@ -3,28 +3,51 @@ import { getErrorMessage } from '../utils/error.util'
 import Room from '../models/room.model'
 import User from '../models/user.model'
 import Message from '../models/message.model'
+import { notifyReceiver } from '../services/socket.service'
+import { findRoomById } from '../services/room.service'
+import {
+  markMessagesAsRead,
+  fetchRoomMessages,
+} from '../services/message.service'
 export const getRooms = async (req: Request, res: Response) => {
   try {
-    //eslint-disable-next-line
-    let rooms: any = await Room.find({
-      participants: req.user?._id,
+    const userId = req.user?._id
+
+    const rooms = await Room.find({
+      participants: userId,
     })
-      .populate('participants', '-password')
-      .populate('groupAdmin', '-password')
-      .populate('lastMessage')
+      .populate([
+        { path: 'participants', select: '-password' },
+        { path: 'groupAdmin', select: '-password' },
+        {
+          path: 'lastMessage',
+          populate: { path: 'sender', select: '-password' },
+        },
+      ])
       .sort({ updatedAt: -1 })
 
-    //populate the last message sender
-    rooms = await User.populate(rooms, {
-      path: 'lastMessage.sender',
-      select: '-password',
+    const unreadMessagesCountMap = new Map<string, number>()
+
+    await Promise.all(
+      rooms.map(async (room) => {
+        const count = await Message.countDocuments({
+          room: room._id,
+          sender: { $ne: userId },
+          'readBy.reader': { $ne: userId },
+        })
+
+        unreadMessagesCountMap.set(room.id, count)
+      })
+    )
+
+    const roomsWithUnreadCount = rooms.map((room) => {
+      return {
+        ...room.toObject(),
+        unreadCount: unreadMessagesCountMap.get(room.id),
+      }
     })
 
-    if (!rooms) {
-      return res.status(200).json([])
-    }
-
-    return res.status(200).json(rooms)
+    return res.status(200).json(roomsWithUnreadCount)
   } catch (error: unknown) {
     console.log(
       getErrorMessage(error, 'Error in Room Controller - getRooms API')
@@ -42,23 +65,31 @@ export const getRoomMessages = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'RoomId is required!' })
     }
 
-    const room = await Room.findOne({
-      _id: roomId,
-      participants: currentUserId,
-    })
+    let room = await findRoomById(roomId)
 
     if (!room) {
       return res.status(404).json({ error: 'Room not found!' })
     }
 
-    const messages = await Message.find({
-      room: roomId,
-    })
-      .populate('sender', '-password')
-      .sort({ createdAt: 1 })
+    //mark messages as read
+    await markMessagesAsRead(roomId, currentUserId?.toString() as string)
 
-    if (!messages) {
+    const messages = await fetchRoomMessages(roomId)
+
+    if (!messages || messages.length === 0) {
       return res.status(200).json([])
+    }
+
+    // If last message is from another user, notify the receiver
+    const lastMessageSenderId = (room.lastMessage as any)?.sender?._id
+    if (
+      lastMessageSenderId &&
+      currentUserId &&
+      lastMessageSenderId !== currentUserId
+    ) {
+      //get the newly updated room
+      room = await findRoomById(roomId)
+      notifyReceiver(currentUserId.toString(), 'lastMessageRead', room)
     }
 
     return res.status(200).json(messages)

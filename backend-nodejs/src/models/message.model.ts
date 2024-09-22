@@ -16,10 +16,19 @@ const MessageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    readBy: [
+      {
+        reader: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
+        readAt: Date,
+      },
+    ],
   },
   { timestamps: true }
 )
-
+MessageSchema.index({ room: 1, 'readBy.reader': 1 })
 const Message = mongoose.model('Message', MessageSchema)
 
 export default Message

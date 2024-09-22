@@ -2,6 +2,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import { IRoom } from '../types/room.type'
+import { getTotalUnreadMessages } from '../services/message.service'
 
 const app = express()
 
@@ -19,7 +20,7 @@ const userSocketMap = new Map<string, string>()
 export const getReceiverSocketId = (receiverId: string) =>
   userSocketMap.get(receiverId)
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log(
     `A user with Session ID: ${
       socket.id
@@ -31,7 +32,6 @@ io.on('connection', (socket) => {
     userSocketMap.set(userId, socket.id)
   }
 
-  //TODO get online users that have a chat with the current user
   // Online Users
   io.emit('getOnlineUsers', Array.from(userSocketMap.keys()))
 
@@ -64,6 +64,18 @@ io.on('connection', (socket) => {
         .in(receiverSocketId)
         .emit('stopTypingReceived', { roomId: room._id.toString(), userId })
     })
+  })
+
+  // total unread messages
+  const totalUnreadMessages = await getTotalUnreadMessages(userId)
+  io.to(socket.id).emit('unreadMessagesCount', totalUnreadMessages)
+
+  //join room
+  socket.on('joinRoom', (roomId: string) => {
+    socket.join(roomId)
+
+    console.log(`User with Session ID: ${socket.id} joined Room ID: ${roomId}`)
+    ;(socket as unknown as { roomId: string }).roomId = roomId
   })
 
   socket.on('disconnect', () => {

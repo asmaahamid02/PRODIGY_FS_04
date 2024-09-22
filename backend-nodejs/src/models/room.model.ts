@@ -27,6 +27,7 @@ const RoomSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
+RoomSchema.index({ participants: 1 })
 const Room = mongoose.model('Room', RoomSchema)
 
 export default Room
