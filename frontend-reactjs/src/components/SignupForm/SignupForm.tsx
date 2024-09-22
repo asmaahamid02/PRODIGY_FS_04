@@ -7,7 +7,7 @@ import PasswordAdornment from '../utils/PasswordAdornment'
 import { ISignupFormValues } from '../../types/signup.type'
 import useSignup from '../../hooks/useSignup'
 import { EGender } from '../../types/user.type'
-import FileInput from '../inputs/FileInput'
+// import FileInput from '../inputs/FileInput'
 
 const signupValidationSchema = Yup.object().shape({
   fullName: Yup.string().required('Full name is required'),
@@ -63,7 +63,7 @@ const SignupForm = () => {
       validationSchema={signupValidationSchema}
       onSubmit={onSubmit}
     >
-      {({ setFieldValue, isSubmitting }) => (
+      {({ isSubmitting }) => (
         <Form className='space-y-4'>
           <TextInput
             type='text'

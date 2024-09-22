@@ -1,15 +1,11 @@
-import { FaBell, FaUserCircle } from 'react-icons/fa'
 import { RiLogoutCircleLine } from 'react-icons/ri'
 import useLogout from '../../../hooks/useLogout'
 import ThemeSwitcher from '../../inputs/ThemeSwitcher'
 import { useAuthContext } from '../../../hooks/useAuthContext'
-import { isDateLessThanHoursAgo } from '../../../utils/date.util'
 
 const HomeNavbar = () => {
   const { logout, loading } = useLogout()
   const { authUser } = useAuthContext()
-
-  const isNew = isDateLessThanHoursAgo(authUser?.createdAt as string)
 
   const handleLogout = async () => {
     await logout()

@@ -1,7 +1,7 @@
 import { useChatContext } from '../../../hooks/useChatContext'
 import useRoomInfo from '../../../hooks/useRoomInfo'
 import { IRoom } from '../../../types/chat.type'
-import { FaArrowLeft, FaEye } from 'react-icons/fa'
+import { FaArrowLeft } from 'react-icons/fa'
 import Avatar from '../../Avatar'
 
 const ChatHeader = () => {

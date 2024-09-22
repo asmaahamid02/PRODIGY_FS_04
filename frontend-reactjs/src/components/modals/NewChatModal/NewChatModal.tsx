@@ -1,11 +1,11 @@
 import { forwardRef, useState } from 'react'
-import Tabs from '../../utils/Tabs'
+// import Tabs from '../../utils/Tabs'
 import DirectChatsTab from '../../Chat/DirectChatsTab'
 import GroupChatsTab from '../../Chat/GroupChatsTab'
 import { IoMdClose } from 'react-icons/io'
 
 const NewChatModal = forwardRef<HTMLDialogElement>((_, ref) => {
-  const [selectedTab, setSelectedTab] = useState(0)
+  const [selectedTab] = useState(0)
 
   return (
     <dialog ref={ref} className='modal max-w-full'>
