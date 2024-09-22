@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
-import { FaPlus } from 'react-icons/fa'
 import RoomItem from '../RoomItem'
 import NewChatModal from '../../modals/NewChatModal'
 import useGetRooms from '../../../hooks/useGetRooms'
 import { useChatContext } from '../../../hooks/useChatContext'
 import SearchInput from '../../inputs/SearchInput'
 import { useModalContext } from '../../../hooks/useModalContext'
+import RoomsHeader from '../RoomsHeader'
 
 const MyRooms = () => {
   const { selectedRoom, rooms } = useChatContext()
-  const { modalRef, openModal } = useModalContext()
+  const { modalRef } = useModalContext()
   const { loading } = useGetRooms()
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -52,15 +52,7 @@ const MyRooms = () => {
       >
         {/* HEADER */}
         <div className='shrink-0 space-y-4 w-full'>
-          <div className='flex items-center justify-between'>
-            <h1 className='text-lg md:text-xl font-bold'>My Chats</h1>
-            <button
-              onClick={openModal}
-              className='btn btn-circle btn-xs btn-primary'
-            >
-              <FaPlus />
-            </button>
-          </div>
+          <RoomsHeader />
           {/* SEARCH */}
           <SearchInput
             searchQuery={searchQuery}

@@ -107,7 +107,7 @@ const SignupForm = () => {
             }
           />
 
-          <FileInput
+          {/* <FileInput
             name='profilePicture'
             accept='image/*'
             label='Profile picture'
@@ -117,7 +117,7 @@ const SignupForm = () => {
                 e.currentTarget.files?.[0] || null
               )
             }
-          />
+          /> */}
 
           <button
             type='submit'

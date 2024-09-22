@@ -15,13 +15,13 @@ const NewChatModal = forwardRef<HTMLDialogElement>((_, ref) => {
             <IoMdClose />
           </button>
         </form>
-        <h3 className='font-bold text-lg'>Create New Chat</h3>
+        <h3 className='font-bold text-lg'>Start New Chat</h3>
         <div className='flex flex-col gap-2 mt-2'>
-          <Tabs
+          {/* <Tabs
             tabs={['Direct', 'Group']}
             selectedTab={selectedTab}
             setSelectedTab={setSelectedTab}
-          />
+          /> */}
 
           <div className='mt-4' role='tabpanel'>
             {selectedTab === 0 ? <DirectChatsTab /> : <GroupChatsTab />}

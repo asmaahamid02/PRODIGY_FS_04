@@ -5,7 +5,8 @@ import { getMessagesService } from '../services/room.service'
 
 const useGetMessages = () => {
   const [loading, setLoading] = useState(false)
-  const { selectedRoom, setMessages } = useChatContext()
+  const { selectedRoom, setMessages, setTotalUnreadMessages, setRooms } =
+    useChatContext()
   const { socket } = useSocketContext()
 
   useEffect(() => {
@@ -19,9 +20,29 @@ const useGetMessages = () => {
           throw new Error(response.error)
         }
 
-        setMessages(response)
+        //update room unread messages
+        const unreadCount = selectedRoom?.unreadCount as number
+        setRooms((prevRooms) => {
+          const updatedRooms = prevRooms.map((room) => {
+            if (room._id === selectedRoom?._id) {
+              return { ...room, unreadCount: 0 }
+            }
 
-        socket?.emit('joinRoom', selectedRoom?._id)
+            return room
+          })
+
+          return updatedRooms
+        })
+
+        //update total unread messages
+        if (setTotalUnreadMessages) {
+          setTotalUnreadMessages((prevCount) => {
+            console.log('prevCount', prevCount)
+            return prevCount > unreadCount ? prevCount - unreadCount : 0
+          })
+        }
+
+        setMessages(response)
       } catch (error: unknown) {
         console.log(error)
       } finally {
@@ -36,7 +57,7 @@ const useGetMessages = () => {
         fetchMessages()
       }
     }
-  }, [selectedRoom, setMessages, socket])
+  }, [selectedRoom, setMessages, socket, setTotalUnreadMessages, setRooms])
 
   return { loading }
 }

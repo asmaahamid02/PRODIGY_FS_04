@@ -3,7 +3,6 @@ import { useChatContext } from '../../../hooks/useChatContext'
 import { IRoom } from '../../../types/chat.type'
 import useRoomInfo from '../../../hooks/useRoomInfo'
 import Avatar from '../../Avatar'
-import { useSocketContext } from '../../../hooks/useSocketContext'
 interface IRoomItemProps {
   room: IRoom
 }
@@ -19,6 +18,9 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
     isOnline,
     typing,
     typingUser,
+    unreadCount,
+    isLastMessageRead,
+    isLastMessageSentByMe,
   } = useRoomInfo({ room })
 
   return (
@@ -45,7 +47,14 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
               <span className='loading loading-dots loading-sm'></span>
             </p>
           ) : (
-            <p className='text-sm truncate'>
+            <p
+              className={`text-sm truncate ${
+                !isLastMessageRead && 'text-accent'
+              }`}
+            >
+              {isLastMessageSentByMe && (
+                <span className='font-medium'>You: </span>
+              )}
               {lastMessageText.length > 50
                 ? lastMessageText.substring(0, 51)
                 : lastMessageText}
@@ -54,8 +63,14 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
         </div>
       </div>
       <div className='space-y-2 flex flex-col items-end'>
-        <p className='text-xs'>{lastMessageTime}</p>
-        <div className='badge badge-accent text-xs'>2</div>
+        <p
+          className={`text-xs ${isLastMessageRead === false && 'text-accent'}`}
+        >
+          {lastMessageTime}
+        </p>
+        {unreadCount && unreadCount > 0 ? (
+          <div className='badge badge-accent text-xs'>{unreadCount}</div>
+        ) : null}
       </div>
     </div>
   )

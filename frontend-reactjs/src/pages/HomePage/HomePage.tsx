@@ -2,10 +2,12 @@ import ChatBox from '../../components/Chat/ChatBox'
 import MyRooms from '../../components/Chat/MyRooms'
 import HomeNavbar from '../../components/navigation/HomeNavbar'
 import ModalContextProvider from '../../context/ModalContext'
+import useTotalUnreadMessagesListener from '../../hooks/useTotalUnreadMessagesListener'
 import useMessageListener from '../../hooks/useMessageListener'
 
 const HomePage = () => {
   //messages listener
+  useTotalUnreadMessagesListener()
   useMessageListener()
 
   return (

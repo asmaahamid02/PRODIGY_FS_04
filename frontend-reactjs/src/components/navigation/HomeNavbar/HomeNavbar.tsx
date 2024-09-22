@@ -18,62 +18,31 @@ const HomeNavbar = () => {
   return (
     <div className='navbar bg-base-100 px-4'>
       <div className='flex-1'>
-        <div className='btn btn-ghost btn-circle'>
-          <ThemeSwitcher />
+        <div className='tooltip tooltip-right me-2' data-tip='Logout'>
+          <button
+            disabled={loading}
+            onClick={handleLogout}
+            className='btn btn-ghost btn-circle'
+          >
+            <RiLogoutCircleLine />
+          </button>
+        </div>
+        <div className='tooltip tooltip-right me-2' data-tip='Change theme'>
+          <div className='btn btn-ghost btn-circle'>
+            <ThemeSwitcher />
+          </div>
         </div>
       </div>
       <div className='flex-none space-x-2'>
-        <div className='dropdown dropdown-end'>
-          <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
-            <div className='indicator'>
-              <FaBell className='w-5 h-5' />
-              <span className='badge badge-sm badge-primary indicator-item'>
-                8
-              </span>
-            </div>
+        <h4 className='font-bold'>{authUser?.fullName}</h4>
+        <div
+          tabIndex={0}
+          role='button'
+          className='btn btn-ghost btn-circle avatar'
+        >
+          <div className='w-10 rounded-full'>
+            <img alt={authUser?.fullName} src={authUser?.profilePicture} />
           </div>
-          <ul
-            tabIndex={0}
-            className='menu menu-md dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 shadow'
-          >
-            <li>
-              <a>lg item 1</a>
-            </li>
-            <li>
-              <a>lg item 2</a>
-            </li>
-          </ul>
-        </div>
-        <div className='dropdown dropdown-end'>
-          <div
-            tabIndex={0}
-            role='button'
-            className='btn btn-ghost btn-circle avatar'
-          >
-            <div className='w-10 rounded-full'>
-              <img alt={authUser?.fullName} src={authUser?.profilePicture} />
-            </div>
-          </div>
-          <ul
-            tabIndex={0}
-            className='menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow'
-          >
-            <li>
-              <a className='flex justify-between'>
-                <FaUserCircle />
-                <span className='flex-1 flex justify-between'>
-                  {authUser?.fullName}
-                  {isNew && <span className='badge'>New</span>}
-                </span>
-              </a>
-            </li>
-            <li>
-              <button disabled={loading} onClick={handleLogout}>
-                <RiLogoutCircleLine />
-                {loading ? 'Logging out...' : 'Logout'}
-              </button>
-            </li>
-          </ul>
         </div>
       </div>
     </div>

@@ -47,9 +47,9 @@ const ChatHeader = () => {
       </div>
 
       {/* VIEW PROFILE BUTTON */}
-      <button className='btn btn-ghost'>
+      {/* <button className='btn btn-ghost'>
         <FaEye />
-      </button>
+      </button> */}
     </div>
   )
 }

@@ -16,6 +16,8 @@ export type TSocketContextType = {
   setTyping?: Dispatch<SetStateAction<boolean>>
   typingInfo?: { userId: string; roomId: string }
   setTypingInfo?: Dispatch<SetStateAction<{ userId: string; roomId: string }>>
+  notifications?: any
+  setNotifications?: any
 }
 
 const initialSocketContext: TSocketContextType = {
@@ -34,6 +36,7 @@ const SocketContextProvider = ({ children }: { children: ReactNode }) => {
     userId: string
     roomId: string
   }>()
+  const [notifications, setNotifications] = useState<any>([])
   const { authUser } = useAuthContext()
 
   //connect socket and get online users

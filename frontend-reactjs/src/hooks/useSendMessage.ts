@@ -5,8 +5,13 @@ import { useChatContext } from './useChatContext'
 
 const useSendMessage = () => {
   const [loading, setLoading] = useState(false)
-  const { setMessages, selectedRoom, setSelectedRoom, setRooms } =
-    useChatContext()
+  const {
+    setMessages,
+    selectedRoom,
+    setSelectedRoom,
+    setRooms,
+    updateLastMessage,
+  } = useChatContext()
 
   const sendMessage = async (receiverId: string, message: string) => {
     setLoading(true)
@@ -28,6 +33,9 @@ const useSendMessage = () => {
 
         setSelectedRoom(response.room as IRoom)
       }
+
+      //update the last message of the room (on the sender side)
+      updateLastMessage(response)
 
       //update messages array
       setMessages((prevMessages) => [...prevMessages, response])

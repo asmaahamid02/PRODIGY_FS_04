@@ -8,7 +8,7 @@ import { MdRoomPreferences } from 'react-icons/md'
 
 const useGetRooms = () => {
   const [loading, setLoading] = useState(false)
-  const { rooms, setRooms } = useChatContext()
+  const { setRooms } = useChatContext()
   const { socket } = useSocketContext()
 
   useEffect(() => {

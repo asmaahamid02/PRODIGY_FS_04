@@ -8,6 +8,7 @@ export interface IRoom {
   groupAdmin?: IUser
   lastMessage: IMessage | null
   isFake?: boolean
+  unreadCount?: number
 }
 
 export interface IMessage {
@@ -15,6 +16,12 @@ export interface IMessage {
   sender: IUser
   room: string | IRoom
   message: string
+  readBy?: [
+    {
+      reader: string
+      readAt: string
+    }
+  ]
   createdAt: string
   updatedAt: string
 }
