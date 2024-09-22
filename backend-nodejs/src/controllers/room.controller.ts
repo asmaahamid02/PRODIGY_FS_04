@@ -95,7 +95,7 @@ export const getRoom = async (req: Request, res: Response) => {
 
     //eslint-disable-next-line
     let room: any = await Room.findOne({
-      participants: receiverId,
+      participants: { $all: [currentUser?._id, receiverId] },
     })
       .populate('participants', '-password')
       .populate('groupAdmin', '-password')

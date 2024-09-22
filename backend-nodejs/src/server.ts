@@ -8,10 +8,10 @@ import connectToMongoDB from './database/mongodb.database'
 import cookieParser from 'cookie-parser'
 import { IUserBasicInfo } from './types/user.type'
 import cors from 'cors'
+import { app, server } from './socket'
 
 dotenv.config()
 
-const app: Express = express()
 const port = process.env.PORT || 8000
 
 //add user property to Request interface
@@ -38,7 +38,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello from Connectify NodeJs App')
 })
 
-app.listen(port, () => {
+server.listen(port, () => {
   connectToMongoDB()
   console.log(`Server is running at port ${port}`)
 })
