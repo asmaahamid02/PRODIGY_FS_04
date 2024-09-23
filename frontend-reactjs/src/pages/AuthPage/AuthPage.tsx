@@ -15,7 +15,7 @@ const AuthPage = () => {
     <div className='flex-1 flex flex-col w-full'>
       <AuthNavbar />
 
-      <main className='flex-1 flex justify-center items-center w-full p-4 overflow-y-auto'>
+      <main className='flex-1 flex justify-center items-center w-full p-4 overflow-y-auto mt-16'>
         <div className='container max-w-xl'>
           <div className='w-full p-6 bg-base-300 rounded-lg mt-10 mb-4'>
             <h1 className='flex justify-center items-center text-primary text-2xl sm:text-4xl font-semibold'>

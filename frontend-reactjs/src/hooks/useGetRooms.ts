@@ -32,7 +32,7 @@ const useGetRooms = () => {
   //roomCreated listener
   useEffect(() => {
     socket?.on('roomCreated', (room: IRoom) => {
-      console.log('room', MdRoomPreferences)
+      console.log('room', room)
       // const isExisted = rooms.find((r) => r._id === room._id)
 
       // if (!isExisted)

@@ -38,7 +38,7 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
     : isToday(lastMessageTime)
     ? formateDateToHoursAndMinutes(lastMessageTime)
     : formateDate(lastMessageTime)
-  const isLastMessageSentByMe = lastMessage?.sender._id === authUser?._id
+  const isLastMessageSentByMe = lastMessage?.sender?._id === authUser?._id
 
   //check if last message is read by the user
   const isLastMessageRead =
