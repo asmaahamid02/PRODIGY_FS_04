@@ -4,7 +4,6 @@ import { IRoom } from '../types/chat.type'
 import { handleError } from '../utils/error.util'
 import { getRoomsService } from '../services/room.service'
 import { useChatContext } from './useChatContext'
-import { MdRoomPreferences } from 'react-icons/md'
 
 const useGetRooms = () => {
   const [loading, setLoading] = useState(false)
