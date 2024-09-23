@@ -31,10 +31,11 @@ export const sendMessage = async (req: Request, res: Response) => {
     }
 
     // Find or create room
-    const room = await findOrCreateRoom(senderId.toString(), receiverId)
+    let room = await findOrCreateRoom(senderId.toString(), receiverId)
     if (!room) {
       return res.status(404).json({ error: 'Room not found or created!' })
     }
+    const isNewRoom = !room.lastMessage
 
     // Create and send message
     const newMessage = await createMessage(
@@ -62,8 +63,16 @@ export const sendMessage = async (req: Request, res: Response) => {
     await populateMessageForResponse(newMessage)
 
     // Notify receiver about new room or message
-    const isNewRoom = !room.lastMessage
     if (isNewRoom) {
+      room = await room.populate([
+        { path: 'groupAdmin', select: '-password' },
+        { path: 'participants', select: '-password' },
+        {
+          path: 'lastMessage',
+          populate: { path: 'sender', select: '-password' },
+        },
+      ])
+
       notifyReceiver(receiverId, 'roomCreated', room)
     }
 
