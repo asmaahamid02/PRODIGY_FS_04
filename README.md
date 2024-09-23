@@ -5,6 +5,8 @@ Connectify is a real-time Chat App that allows users to connect with friends, fa
 ## Table of Contents
 
 - [Author](#author)
+- [Demo](#demo)
+- [Requirements](#requirements)
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -13,10 +15,29 @@ Connectify is a real-time Chat App that allows users to connect with friends, fa
 
 [Asmaa Hamid](https://linktr.ee/asmaahamid02)
 
+## Demo
+
+> [Live Demo](https://connectify-gd98.onrender.com)
+
+<img src='./readme/chat-app-demo-1.gif' alt='Chat App Demo' />
+<img src='./readme/chat-app-demo-2.gif' alt='Chat App Demo' />
+
+## Requirements
+
+- Nodejs v18.x : [Installation guide](https://nodejs.org/en/download/package-manager/current)
+- MongoDB : [Installation guide](https://www.mongodb.com/docs/atlas/getting-started/)
+
 ## Features
 
 - Registration and authentication
 - Real-time messaging
+- Real-time total unread messages count
+- Real-time room unread messages count
+- Real-time online/offline status
+- Typing Indicators
+- Search users & rooms
+- Mobile-Friendly Design
+- Dark Mode
 
 ## Installation
 
@@ -26,41 +47,34 @@ Connectify is a real-time Chat App that allows users to connect with friends, fa
    git clone https://github.com/asmaahamid02/connectify.git
    ```
 
-2. Install the dependencies (root directory):
+2. Build the app:
 
    ```bash
-   npm install
+   npm run build
    ```
 
-3. Install the dependencies (frontend-reactjs directory):
-
-   ```bash
-   cd frontend-reactjs
-   npm install
-   ```
-
-4. Copy the `.env.example` file and rename it to `.env`:
+3. Copy the `.env.example` file and rename it to `.env`:
 
    ```bash
    cp .env.example .env
    ```
 
+4. Generate JWT Secret key:
+
+   ```bash
+    openssl rand -base64 32
+   ```
+
 5. Update the `.env` file with your MongoDB URI and JWT secret key
 
-6. Start the server (root directory):
+6. Start the server:
 
    ```bash
    npm run start
    ```
 
-7. Start the client (frontend-reactjs directory):
-
-   ```bash
-   npm start
-   ```
-
 ## Usage
 
-1. Open your browser and go to `http://localhost:3000`
+1. Open your browser and go to `http://localhost:5000`
 2. Sign up or log in to your account
 3. Explore the different features and functionalities of Connectify
