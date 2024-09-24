@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react'
+import { useState } from 'react'
 import { FiImage } from 'react-icons/fi'
 import { IoSend } from 'react-icons/io5'
 import useSendMessage from '../../../hooks/requests/useSendMessage'
@@ -7,6 +7,8 @@ import { useChatContext } from '../../../hooks/context/useChatContext'
 import { IRoom } from '../../../types/chat.type'
 import Spinner from '../../utils/Spinner'
 import { useSocketContext } from '../../../hooks/context/useSocketContext'
+import InputEmoji from 'react-input-emoji'
+import { useThemeContext } from '../../../hooks/context/useThemeContext'
 
 const SendMessage = () => {
   const [message, setMessage] = useState('')
@@ -15,6 +17,7 @@ const SendMessage = () => {
   const { loading, sendMessage } = useSendMessage()
   const { sender } = useRoomInfo({ room: selectedRoom as IRoom })
   const { socket } = useSocketContext()
+  const { theme } = useThemeContext()
 
   const handleSendMessage = async () => {
     if (message.trim() === '') return
@@ -23,8 +26,8 @@ const SendMessage = () => {
     setMessage('')
   }
 
-  const handleTyping = (e: ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value)
+  const handleTyping = (text: string) => {
+    setMessage(text)
 
     if (!isTyping) {
       console.log('typing')
@@ -45,12 +48,21 @@ const SendMessage = () => {
       <label htmlFor='file' className='btn btn-sm btn-square btn-ghost'>
         <FiImage />
       </label>
-      <input
-        type='text'
-        placeholder='Type here'
-        className='input input-ghost flex-1 focus:border-none focus:ring-0 focus:outline-none'
+      <InputEmoji
         value={message}
         onChange={handleTyping}
+        cleanOnEnter
+        placeholder='Type a message'
+        shouldConvertEmojiToImage={false}
+        shouldReturn={true}
+        background='transparent'
+        borderColor='transparent'
+        theme={theme === 'light' ? 'light' : 'dark'}
+        color={
+          theme === 'light'
+            ? 'oklch(0.278078 0.029596 256.848)'
+            : 'oklch(0.746477 0.0216 264.436)'
+        }
       />
       {loading ? (
         <Spinner size='' />

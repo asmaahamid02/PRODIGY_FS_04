@@ -1,6 +1,6 @@
 import Message from '../models/message.model'
 import Room from '../models/room.model'
-import { io } from '../socket'
+import { io } from '../config/socket.config'
 import { getErrorMessage } from '../utils/error.util'
 
 export const getTotalUnreadMessages = async (userId: string) => {

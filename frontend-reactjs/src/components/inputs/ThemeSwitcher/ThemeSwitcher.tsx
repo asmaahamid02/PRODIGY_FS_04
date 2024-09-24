@@ -1,9 +1,13 @@
 import { MdOutlineWbSunny } from 'react-icons/md'
-import useThemeToggle from '../../../hooks/useThemeToggle'
 import { IoMoon } from 'react-icons/io5'
+import { useThemeContext } from '../../../hooks/context/useThemeContext'
+import { ChangeEvent } from 'react'
 
 const ThemeSwitcher = () => {
-  const { theme, handleThemeChange } = useThemeToggle()
+  const { theme, handleThemeChange } = useThemeContext()
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) =>
+    handleThemeChange(e.target.value)
 
   return (
     <label className='swap swap-rotate'>
@@ -12,7 +16,7 @@ const ThemeSwitcher = () => {
         type='checkbox'
         className='theme-controller'
         value={theme}
-        onChange={handleThemeChange}
+        onChange={handleChange}
       />
 
       {/* sun icon */}

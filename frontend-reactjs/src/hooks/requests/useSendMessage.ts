@@ -1,17 +1,10 @@
 import { useState } from 'react'
 import { sendMessageService } from '../../services/message.service'
-import { IRoom } from '../../types/chat.type'
 import { useChatContext } from '../context/useChatContext'
 
 const useSendMessage = () => {
   const [loading, setLoading] = useState(false)
-  const {
-    setMessages,
-    selectedRoom,
-    setSelectedRoom,
-    setRooms,
-    updateLastMessage,
-  } = useChatContext()
+  const { setMessages, updateLastMessage } = useChatContext()
 
   const sendMessage = async (receiverId: string, message: string) => {
     setLoading(true)

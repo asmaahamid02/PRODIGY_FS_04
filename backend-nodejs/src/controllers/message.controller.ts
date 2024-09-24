@@ -41,7 +41,7 @@ export const sendMessage = async (req: Request, res: Response) => {
 
     // Create and send message
     const newMessage = await Message.create({
-      senderId,
+      sender: senderId,
       message,
       room: room._id.toString(),
     })

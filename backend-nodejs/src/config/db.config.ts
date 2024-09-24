@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import { getErrorMessage } from '../utils/error.util'
 
-const connectToMongoDB = async () => {
+const connectToDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI as string)
     console.log('Connected to MongoDB successfully!')
@@ -10,4 +10,4 @@ const connectToMongoDB = async () => {
   }
 }
 
-export default connectToMongoDB
+export default connectToDB

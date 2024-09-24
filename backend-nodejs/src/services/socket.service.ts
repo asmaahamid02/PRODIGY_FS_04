@@ -1,4 +1,4 @@
-import { getReceiverSocketId, io } from '../socket'
+import { getReceiverSocketId, io } from '../config/socket.config'
 export const notifyReceiver = (
   receiverId: string,
   event: string,

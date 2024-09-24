@@ -4,11 +4,11 @@ import authRoutes from './routes/auth.route'
 import roomRoutes from './routes/room.route'
 import messageRoutes from './routes/message.route'
 import userRoutes from './routes/user.route'
-import connectToMongoDB from './database/mongodb.database'
+import connectToDB from './config/db.config'
 import cookieParser from 'cookie-parser'
 import { IUser } from './types/user.type'
 import cors from 'cors'
-import { app, server } from './socket'
+import { app, server } from './config/socket.config'
 import path from 'path'
 
 dotenv.config()
@@ -44,6 +44,6 @@ app.get('*', (req: Request, res: Response) => {
 })
 
 server.listen(port, () => {
-  connectToMongoDB()
+  connectToDB()
   console.log(`Server is running at port ${port}`)
 })
