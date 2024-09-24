@@ -1,4 +1,4 @@
-import { useChatContext } from '../../../hooks/useChatContext'
+import { useChatContext } from '../../../hooks/context/useChatContext'
 import useRoomInfo from '../../../hooks/useRoomInfo'
 import { IRoom } from '../../../types/chat.type'
 import { FaArrowLeft } from 'react-icons/fa'

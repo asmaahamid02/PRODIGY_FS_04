@@ -1,5 +1,5 @@
 import UserItem from '../UserItem'
-import useSearchUsers from '../../../hooks/useSearchUsers'
+import useSearchUsers from '../../../hooks/requests/useSearchUsers'
 import { useState } from 'react'
 import SearchInput from '../../inputs/SearchInput'
 import Spinner from '../../utils/Spinner'

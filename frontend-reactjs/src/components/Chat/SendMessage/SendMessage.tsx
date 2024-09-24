@@ -1,12 +1,12 @@
 import { ChangeEvent, useState } from 'react'
 import { FiImage } from 'react-icons/fi'
 import { IoSend } from 'react-icons/io5'
-import useSendMessage from '../../../hooks/useSendMessage'
+import useSendMessage from '../../../hooks/requests/useSendMessage'
 import useRoomInfo from '../../../hooks/useRoomInfo'
-import { useChatContext } from '../../../hooks/useChatContext'
+import { useChatContext } from '../../../hooks/context/useChatContext'
 import { IRoom } from '../../../types/chat.type'
 import Spinner from '../../utils/Spinner'
-import { useSocketContext } from '../../../hooks/useSocketContext'
+import { useSocketContext } from '../../../hooks/context/useSocketContext'
 
 const SendMessage = () => {
   const [message, setMessage] = useState('')

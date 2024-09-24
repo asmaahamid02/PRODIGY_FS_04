@@ -7,7 +7,6 @@ export interface IRoom {
   groupName?: string
   groupAdmin?: IUser
   lastMessage: IMessage | null
-  isFake?: boolean
   unreadCount?: number
 }
 

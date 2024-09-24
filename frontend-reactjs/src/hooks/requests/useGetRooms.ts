@@ -1,9 +1,9 @@
-import { useSocketContext } from './useSocketContext'
+import { useSocketContext } from '../context/useSocketContext'
 import { useEffect, useState } from 'react'
-import { IRoom } from '../types/chat.type'
-import { handleError } from '../utils/error.util'
-import { getRoomsService } from '../services/room.service'
-import { useChatContext } from './useChatContext'
+import { IRoom } from '../../types/chat.type'
+import { handleError } from '../../utils/error.util'
+import { getRoomsService } from '../../services/room.service'
+import { useChatContext } from '../context/useChatContext'
 
 const useGetRooms = () => {
   const [loading, setLoading] = useState(false)

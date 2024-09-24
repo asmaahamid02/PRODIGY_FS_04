@@ -7,7 +7,7 @@ import {
   useEffect,
   useState,
 } from 'react'
-import { useAuthContext } from '../hooks/useAuthContext'
+import { useAuthContext } from '../hooks/context/useAuthContext'
 
 export type TSocketContextType = {
   socket: Socket | null

@@ -7,7 +7,8 @@ import {
   useState,
 } from 'react'
 import { IMessage, IRoom } from '../types/chat.type'
-import { useSocketContext } from '../hooks/useSocketContext'
+import { useSocketContext } from '../hooks/context/useSocketContext'
+import { IUser } from '../types/user.type'
 
 type TChatContext = {
   selectedRoom: IRoom | null
@@ -33,7 +34,13 @@ const initialState: TChatContext = {
 
 export const ChatContext = createContext<TChatContext>(initialState)
 
-const ChatContextProvider = ({ children }: { children: ReactNode }) => {
+const ChatContextProvider = ({
+  children,
+  authUser,
+}: {
+  children: ReactNode
+  authUser: IUser | null
+}) => {
   const [selectedRoom, setSelectedRoom] = useState<IRoom | null>(null)
   const [messages, setMessages] = useState<IMessage[]>([])
   const [rooms, setRooms] = useState<IRoom[]>([])
@@ -97,27 +104,11 @@ const ChatContextProvider = ({ children }: { children: ReactNode }) => {
     // })
   }
 
-  //remove fake rooms when the selectedRoom is changed
-  useEffect(() => {
-    if (selectedRoom) {
-      //remove fake rooms without selectedRoom
-      const newRooms = rooms.filter(
-        (room) => !room.isFake || room._id === selectedRoom._id
-      )
-
-      if (newRooms.length !== rooms.length) setRooms(newRooms)
-    }
-  }, [selectedRoom, rooms])
-
   useEffect(() => {
     if (selectedRoom) {
       socket?.emit('joinRoom', selectedRoom._id)
     }
   }, [selectedRoom, socket])
-
-  useEffect(() => {
-    console.log('rooms', rooms)
-  }, [rooms])
 
   return (
     <ChatContext.Provider

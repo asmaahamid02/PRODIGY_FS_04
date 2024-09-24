@@ -1,6 +1,6 @@
 import { FaPlus } from 'react-icons/fa'
-import { useChatContext } from '../../../hooks/useChatContext'
-import { useModalContext } from '../../../hooks/useModalContext'
+import { useChatContext } from '../../../hooks/context/useChatContext'
+import { useModalContext } from '../../../hooks/context/useModalContext'
 
 const RoomsHeader = () => {
   const { totalUnreadMessages } = useChatContext()

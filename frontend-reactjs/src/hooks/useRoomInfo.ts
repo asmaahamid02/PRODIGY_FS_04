@@ -1,13 +1,13 @@
 import { IRoom } from '../types/chat.type'
-import { useChatContext } from './useChatContext'
-import { useAuthContext } from './useAuthContext'
+import { useChatContext } from './context/useChatContext'
+import { useAuthContext } from './context/useAuthContext'
 import {
   formateDate,
   formateDateToHoursAndMinutes,
   isToday,
   isYesterday,
 } from '../utils/date.util'
-import { useSocketContext } from './useSocketContext'
+import { useSocketContext } from './context/useSocketContext'
 
 interface IRoomInfoProps {
   room: IRoom
@@ -42,7 +42,9 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
 
   //check if last message is read by the user
   const isLastMessageRead =
-    lastMessage?.sender._id === authUser?._id || selectedRoom?._id === room?._id
+    !lastMessage ||
+    lastMessage?.sender._id === authUser?._id ||
+    selectedRoom?._id === room?._id
       ? true
       : lastMessage?.readBy?.some((item) => item.reader === authUser?._id)
 

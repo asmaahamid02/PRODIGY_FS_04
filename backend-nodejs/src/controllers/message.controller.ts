@@ -3,12 +3,15 @@ import { getErrorMessage } from '../utils/error.util'
 import { validateRequiredFields } from '../utils/validation.util'
 import { notifyReceiver } from '../services/socket.service'
 import {
-  createMessage,
   getTotalUnreadMessages,
   populateMessageForResponse,
   updateMessageReadStatus,
 } from '../services/message.service'
-import { findOrCreateRoom } from '../services/room.service'
+import {
+  findOrCreateRoom,
+  findRoomByParticipants,
+} from '../services/room.service'
+import Message from '../models/message.model'
 
 export const sendMessage = async (req: Request, res: Response) => {
   try {
@@ -31,18 +34,18 @@ export const sendMessage = async (req: Request, res: Response) => {
     }
 
     // Find or create room
-    let room = await findOrCreateRoom(senderId.toString(), receiverId)
+    const room = await findRoomByParticipants([senderId.toString(), receiverId])
     if (!room) {
-      return res.status(404).json({ error: 'Room not found or created!' })
+      return res.status(404).json({ error: 'Room not found' })
     }
-    const isNewRoom = !room.lastMessage
 
     // Create and send message
-    const newMessage = await createMessage(
-      senderId.toString(),
+    const newMessage = await Message.create({
+      senderId,
       message,
-      room._id.toString()
-    )
+      room: room._id.toString(),
+    })
+
     if (!newMessage) {
       return res.status(500).json({ error: 'Failed to send message!' })
     }
@@ -63,30 +66,30 @@ export const sendMessage = async (req: Request, res: Response) => {
     await populateMessageForResponse(newMessage)
 
     // Notify receiver about new room or message
-    if (isNewRoom) {
-      room = await room.populate([
-        { path: 'groupAdmin', select: '-password' },
-        { path: 'participants', select: '-password' },
-        {
-          path: 'lastMessage',
-          populate: { path: 'sender', select: '-password' },
-        },
-      ])
+    // if (isNewRoom) {
+    //   room = await room.populate([
+    //     { path: 'groupAdmin', select: '-password' },
+    //     { path: 'participants', select: '-password' },
+    //     {
+    //       path: 'lastMessage',
+    //       populate: { path: 'sender', select: '-password' },
+    //     },
+    //   ])
 
-      notifyReceiver(receiverId, 'roomCreated', room)
-    }
+    //   notifyReceiver(receiverId, 'roomCreated', room)
+    // }
 
-    room.participants.forEach((participant) => {
-      if (participant._id.toString() === senderId.toString()) {
-        return
-      }
+    // room.participants.forEach((participant) => {
+    //   if (participant._id.toString() === senderId.toString()) {
+    //     return
+    //   }
 
-      notifyReceiver(participant._id.toString(), 'messageReceived', newMessage)
-    })
+    //   notifyReceiver(participant._id.toString(), 'messageReceived', newMessage)
+    // })
 
     //notify receiver about unread messages count
-    const totalUnreadMessages = await getTotalUnreadMessages(receiverId)
-    notifyReceiver(receiverId, 'unreadMessagesCount', totalUnreadMessages)
+    // const totalUnreadMessages = await getTotalUnreadMessages(receiverId)
+    // notifyReceiver(receiverId, 'unreadMessagesCount', totalUnreadMessages)
 
     return res.status(201).json(newMessage)
   } catch (error) {

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useAuthContext } from './useAuthContext'
-import { removeUserFromLocalStorage } from '../services/localStorage.service'
+import { useAuthContext } from '../context/useAuthContext'
+import { removeUserFromLocalStorage } from '../../services/localStorage.service'
 import toast from 'react-hot-toast'
-import { useChatContext } from './useChatContext'
+import { useChatContext } from '../context/useChatContext'
 
 const useLogout = () => {
   const [loading, setLoading] = useState(false)

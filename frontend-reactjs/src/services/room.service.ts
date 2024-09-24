@@ -10,7 +10,7 @@ export const getRoomsService = async (): Promise<IRoom[]> => {
 export const getRoomService = async (
   receiverId: string
 ): Promise<
-  | IRoom
+  | { room: IRoom; isNew: boolean }
   | {
       error: string
     }

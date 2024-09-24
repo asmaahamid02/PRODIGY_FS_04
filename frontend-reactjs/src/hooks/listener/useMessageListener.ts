@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { useSocketContext } from './useSocketContext'
-import { useChatContext } from './useChatContext'
-import { IMessage, IRoom } from '../types/chat.type'
-import notificationSound from '../assets/audio/notification.mp3'
+import { useSocketContext } from '../context/useSocketContext'
+import { useChatContext } from '../context/useChatContext'
+import { IMessage, IRoom } from '../../types/chat.type'
+import notificationSound from '../../assets/audio/notification.mp3'
 
 const useMessageListener = () => {
   const { socket } = useSocketContext()

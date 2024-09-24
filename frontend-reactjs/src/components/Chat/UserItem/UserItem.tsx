@@ -1,11 +1,11 @@
 import { FC } from 'react'
-import { useAuthContext } from '../../../hooks/useAuthContext'
+import { useAuthContext } from '../../../hooks/context/useAuthContext'
 import { isDateLessThanHoursAgo } from '../../../utils/date.util'
 import { IUser } from '../../../types/user.type'
-import useGetRoom from '../../../hooks/useGetRoom'
-import { useChatContext } from '../../../hooks/useChatContext'
+import useGetRoom from '../../../hooks/requests/useGetRoom'
+import { useChatContext } from '../../../hooks/context/useChatContext'
 import { IRoom } from '../../../types/chat.type'
-import { useModalContext } from '../../../hooks/useModalContext'
+import { useModalContext } from '../../../hooks/context/useModalContext'
 import Spinner from '../../utils/Spinner'
 import Avatar from '../../Avatar'
 
@@ -15,7 +15,6 @@ interface UserItemProps {
 
 const UserItem: FC<UserItemProps> = ({ user }) => {
   const { authUser } = useAuthContext()
-  const { setSelectedRoom } = useChatContext()
   const { loading, getRoom } = useGetRoom()
   const { closeModal } = useModalContext()
 
@@ -23,8 +22,7 @@ const UserItem: FC<UserItemProps> = ({ user }) => {
 
   const handleUserClick = async () => {
     if (loading) return
-    const room = await getRoom(user._id)
-    setSelectedRoom(room as IRoom)
+    await getRoom(user._id)
     closeModal()
   }
 

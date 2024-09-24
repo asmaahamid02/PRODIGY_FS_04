@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { useChatContext } from '../../../hooks/useChatContext'
+import { useChatContext } from '../../../hooks/context/useChatContext'
 import { IRoom } from '../../../types/chat.type'
 import useRoomInfo from '../../../hooks/useRoomInfo'
 import Avatar from '../../Avatar'

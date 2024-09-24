@@ -4,7 +4,10 @@ import Room from '../models/room.model'
 import User from '../models/user.model'
 import Message from '../models/message.model'
 import { notifyReceiver } from '../services/socket.service'
-import { findRoomById } from '../services/room.service'
+import {
+  findOrCreateRoomByParticipants,
+  findRoomById,
+} from '../services/room.service'
 import {
   markMessagesAsRead,
   fetchRoomMessages,
@@ -66,7 +69,6 @@ export const getRoomMessages = async (req: Request, res: Response) => {
     }
 
     let room = await findRoomById(roomId)
-
     if (!room) {
       return res.status(404).json({ error: 'Room not found!' })
     }
@@ -104,7 +106,7 @@ export const getRoomMessages = async (req: Request, res: Response) => {
 export const getRoom = async (req: Request, res: Response) => {
   try {
     const { receiverId } = req.params
-    const currentUser = req.user
+    const currentUserId = req.user?._id
 
     if (!receiverId) {
       return res.status(400).json({ error: 'receiverId is required!' })
@@ -116,34 +118,12 @@ export const getRoom = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'User not found!' })
     }
 
-    const fakeRoom = {
-      _id: new Date().getTime().toString(),
-      participants: [currentUser, receiver],
-      lastMessage: null,
-      isGroup: false,
-      isFake: true,
-    }
+    const { room, isNew } = await findOrCreateRoomByParticipants([
+      currentUserId ? currentUserId.toString() : '',
+      receiverId,
+    ])
 
-    //eslint-disable-next-line
-    let room: any = await Room.findOne({
-      participants: { $all: [currentUser?._id, receiverId] },
-    })
-      .populate('participants', '-password')
-      .populate('groupAdmin', '-password')
-      .populate('lastMessage')
-
-    if (!room) {
-      //return fake room
-      return res.status(200).json(fakeRoom)
-    }
-
-    //populate the last message sender
-    room = await User.populate(room, {
-      path: 'lastMessage.sender',
-      select: '-password',
-    })
-
-    return res.status(200).json(room)
+    return res.status(200).json({ room, isNew })
   } catch (error: unknown) {
     console.log(
       getErrorMessage(error, 'Error in Room Controller - getRoom API')

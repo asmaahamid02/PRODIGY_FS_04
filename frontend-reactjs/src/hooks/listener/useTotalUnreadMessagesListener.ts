@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useChatContext } from './useChatContext'
-import { useSocketContext } from './useSocketContext'
+import { useChatContext } from '../context/useChatContext'
+import { useSocketContext } from '../context/useSocketContext'
 
 const useTotalUnreadMessagesListener = () => {
   const { setTotalUnreadMessages } = useChatContext()

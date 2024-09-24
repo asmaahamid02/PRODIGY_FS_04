@@ -5,7 +5,7 @@ import TextInput from '../inputs/TextInput'
 import { FaKey, FaUser } from 'react-icons/fa'
 import PasswordAdornment from '../utils/PasswordAdornment'
 import { ISignupFormValues } from '../../types/signup.type'
-import useSignup from '../../hooks/useSignup'
+import useSignup from '../../hooks/requests/useSignup'
 import { EGender } from '../../types/user.type'
 // import FileInput from '../inputs/FileInput'
 

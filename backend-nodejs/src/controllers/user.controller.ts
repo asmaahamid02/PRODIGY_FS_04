@@ -30,3 +30,20 @@ export const searchUsers = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Internal Server Error!' })
   }
 }
+
+export const getUser = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password')
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found!' })
+    }
+
+    return res.status(200).json(user)
+  } catch (error: unknown) {
+    console.log(
+      getErrorMessage(error, 'Error in User Controller - getUser API')
+    )
+    return res.status(500).json({ error: 'Internal Server Error!' })
+  }
+}

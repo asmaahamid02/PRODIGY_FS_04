@@ -1,7 +1,7 @@
-import { useSocketContext } from './useSocketContext'
+import { useSocketContext } from '../context/useSocketContext'
 import { useEffect, useState } from 'react'
-import { useChatContext } from './useChatContext'
-import { getMessagesService } from '../services/room.service'
+import { useChatContext } from '../context/useChatContext'
+import { getMessagesService } from '../../services/room.service'
 
 const useGetMessages = () => {
   const [loading, setLoading] = useState(false)
@@ -53,9 +53,7 @@ const useGetMessages = () => {
     if (selectedRoom) {
       setMessages([])
 
-      if (!selectedRoom.isFake) {
-        fetchMessages()
-      }
+      fetchMessages()
     }
   }, [selectedRoom, setMessages, socket, setTotalUnreadMessages, setRooms])
 

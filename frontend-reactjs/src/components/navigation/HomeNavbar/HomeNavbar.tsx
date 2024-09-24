@@ -1,7 +1,7 @@
 import { RiLogoutCircleLine } from 'react-icons/ri'
-import useLogout from '../../../hooks/useLogout'
+import useLogout from '../../../hooks/requests/useLogout'
 import ThemeSwitcher from '../../inputs/ThemeSwitcher'
-import { useAuthContext } from '../../../hooks/useAuthContext'
+import { useAuthContext } from '../../../hooks/context/useAuthContext'
 
 const HomeNavbar = () => {
   const { logout, loading } = useLogout()

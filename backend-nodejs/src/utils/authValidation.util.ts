@@ -1,18 +1,22 @@
-import { EGender, IUserBody } from '../types/user.type'
+import { EGender, IUserRequest } from '../types/user.type'
 import { Request } from 'express'
 import { validateRequiredFields } from './validation.util'
+import Validator from 'validator'
 
 // Utility function to validate username format
 const validateUsername = (
   username: string
 ): { valid: boolean; message?: string } => {
-  const usernameRegex = /^[a-zA-Z0-9]{5,20}$/
-  if (!usernameRegex.test(username)) {
+  const isLengthValid = Validator.isLength(username.trim(), { min: 5, max: 20 })
+  const isAlphanumeric = Validator.isAlphanumeric(username)
+
+  if (!isLengthValid || !isAlphanumeric) {
     return {
       valid: false,
       message: 'Invalid username. Must contain 5-20 alphanumeric characters.',
     }
   }
+
   return { valid: true }
 }
 
@@ -20,15 +24,17 @@ const validateUsername = (
 const validatePassword = (
   password: string
 ): { valid: boolean; message?: string } => {
-  const passwordRegex =
-    /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/
-  if (!passwordRegex.test(password)) {
+  const isLengthValid = Validator.isLength(password.trim(), { min: 8, max: 20 })
+  const isStrongPassword = Validator.isStrongPassword(password)
+
+  if (!isLengthValid || !isStrongPassword) {
     return {
       valid: false,
       message:
         'Invalid password. Must be 8-20 characters long and include uppercase, lowercase, number, and special character.',
     }
   }
+
   return { valid: true }
 }
 
@@ -51,7 +57,7 @@ const validateGender = (
   return { valid: true }
 }
 
-export const validateSignup: (req: Request) => {
+export const validateSignupRequest: (req: Request) => {
   valid: boolean
   message: string
 } = (req: Request) => {
@@ -72,7 +78,7 @@ export const validateSignup: (req: Request) => {
     return validateRequiredFieldsResponse
   }
 
-  const { username, password, confirmPassword, gender }: IUserBody = req.body
+  const { username, password, confirmPassword, gender }: IUserRequest = req.body
 
   const usernameValidation = validateUsername(username)
   if (!usernameValidation.valid) {

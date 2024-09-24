@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { signupService } from '../services/auth.service'
-import { ISignupFormValues } from '../types/signup.type'
-import { useAuthContext } from './useAuthContext'
-import { IUser } from '../types/user.type'
-import { handleError } from '../utils/error.util'
-import { saveUserToLocalStorage } from '../services/localStorage.service'
+import { signupService } from '../../services/auth.service'
+import { ISignupFormValues } from '../../types/signup.type'
+import { useAuthContext } from '../context/useAuthContext'
+import { IUser } from '../../types/user.type'
+import { handleError } from '../../utils/error.util'
+import { saveUserToLocalStorage } from '../../services/localStorage.service'
 import toast from 'react-hot-toast'
 
 const useSignup = () => {

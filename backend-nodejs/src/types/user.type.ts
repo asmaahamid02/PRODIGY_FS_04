@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 
-export interface IUserBody {
+export interface IUserRequest {
   fullName: string
   username: string
   password: string
@@ -13,7 +13,7 @@ export enum EGender {
   Female = 'female',
 }
 
-export interface IUserBasicInfo {
+export interface IUser {
   _id: ObjectId
   fullName: string
   username: string

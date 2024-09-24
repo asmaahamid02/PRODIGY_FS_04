@@ -1,17 +1,18 @@
 import { Request, Response } from 'express'
 import User from '../models/user.model'
 import { getErrorMessage } from '../utils/error.util'
-import { IUserBody } from '../types/user.type'
-import { validateSignup } from '../utils/authValidation.util'
+import { IUserRequest } from '../types/user.type'
+import { validateSignupRequest } from '../utils/authValidation.util'
 import bcrypt from 'bcryptjs'
-import { createToken, clearToken } from '../utils/jwt.util'
+import { createToken } from '../utils/jwt.util'
+import { validateRequiredFields } from '../utils/validation.util'
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { fullName, username, password, gender }: IUserBody = req.body
+    const { fullName, username, password, gender }: IUserRequest = req.body
 
     //Validate the request body
-    const validationResult = validateSignup(req)
+    const validationResult = validateSignupRequest(req)
     if (!validationResult.valid) {
       return res.status(400).json({ error: validationResult.message })
     }
@@ -42,10 +43,10 @@ export const signup = async (req: Request, res: Response) => {
 
     if (newUser) {
       //generate JWT token
-      const token = createToken(
-        { userId: newUser._id, username: newUser.username },
-        res
-      )
+      const token = createToken({
+        userId: newUser._id,
+        username: newUser.username,
+      })
 
       await newUser.save()
 
@@ -69,7 +70,16 @@ export const signup = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { username, password }: IUserBody = req.body
+    const { username, password }: IUserRequest = req.body
+
+    const validateRequiredFieldsResponse = validateRequiredFields(req.body, [
+      'username',
+      'password',
+    ])
+
+    if (!validateRequiredFieldsResponse.valid) {
+      return validateRequiredFieldsResponse
+    }
 
     const user = await User.findOne({ username })
 
@@ -82,7 +92,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid credentials!' })
     }
 
-    const token = createToken({ userId: user._id, username }, res)
+    const token = createToken({ userId: user._id, username })
 
     res.status(200).json({
       _id: user._id,
@@ -95,16 +105,6 @@ export const login = async (req: Request, res: Response) => {
     })
   } catch (error: unknown) {
     console.log(getErrorMessage(error, 'Error in Auth Controller - Login API'))
-    return res.status(500).json({ error: 'Internal Server Error!' })
-  }
-}
-export const logout = (req: Request, res: Response) => {
-  try {
-    clearToken(res)
-
-    res.status(200).json({ message: 'Logout successfully!' })
-  } catch (error: unknown) {
-    console.log(getErrorMessage(error, 'Error in Auth Controller - Logout API'))
     return res.status(500).json({ error: 'Internal Server Error!' })
   }
 }

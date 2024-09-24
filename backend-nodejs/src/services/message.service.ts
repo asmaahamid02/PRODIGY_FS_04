@@ -3,22 +3,6 @@ import Room from '../models/room.model'
 import { io } from '../socket'
 import { getErrorMessage } from '../utils/error.util'
 
-export const createMessage = async (
-  senderId: string,
-  message: string,
-  roomId: string,
-  readBy?: [{ reader: string; readAt: Date }]
-) => {
-  const newMessage = await Message.create({
-    sender: senderId,
-    message,
-    room: roomId,
-    readBy,
-  })
-
-  return newMessage
-}
-
 export const getTotalUnreadMessages = async (userId: string) => {
   try {
     const rooms = await Room.find({ participants: userId }).select('_id')

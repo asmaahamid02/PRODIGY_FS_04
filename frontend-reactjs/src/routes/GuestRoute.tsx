@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { PathConstants } from './PathConstants'
-import { useAuthContext } from '../hooks/useAuthContext'
+import { useAuthContext } from '../hooks/context/useAuthContext'
 
 const GuestRoute = () => {
   const { authUser } = useAuthContext()

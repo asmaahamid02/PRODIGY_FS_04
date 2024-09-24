@@ -6,7 +6,7 @@ import messageRoutes from './routes/message.route'
 import userRoutes from './routes/user.route'
 import connectToMongoDB from './database/mongodb.database'
 import cookieParser from 'cookie-parser'
-import { IUserBasicInfo } from './types/user.type'
+import { IUser } from './types/user.type'
 import cors from 'cors'
 import { app, server } from './socket'
 import path from 'path'
@@ -20,7 +20,7 @@ const BASEDIR = path.resolve()
 //add user property to Request interface
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: IUserBasicInfo | null
+    user?: IUser | null
   }
 }
 
