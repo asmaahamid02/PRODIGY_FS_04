@@ -1,33 +1,22 @@
 import { Request, Response } from 'express'
 import { getErrorMessage } from '../utils/error.util'
-import Room from '../models/room.model'
 import User from '../models/user.model'
 import Message from '../models/message.model'
 import { notifyReceiver } from '../services/socket.service'
 import {
   findOrCreateRoomByParticipants,
+  findParticipantRooms,
   findRoomById,
 } from '../services/room.service'
 import {
-  markMessagesAsRead,
+  markRoomsMessagesAsRead,
   fetchRoomMessages,
 } from '../services/message.service'
 export const getRooms = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id
 
-    const rooms = await Room.find({
-      participants: userId,
-    })
-      .populate([
-        { path: 'participants', select: '-password' },
-        { path: 'groupAdmin', select: '-password' },
-        {
-          path: 'lastMessage',
-          populate: { path: 'sender', select: '-password' },
-        },
-      ])
-      .sort({ updatedAt: -1 })
+    const rooms = await findParticipantRooms(userId?.toString() || '')
 
     const unreadMessagesCountMap = new Map<string, number>()
 
@@ -74,7 +63,7 @@ export const getRoomMessages = async (req: Request, res: Response) => {
     }
 
     //mark messages as read
-    await markMessagesAsRead(roomId, currentUserId?.toString() as string)
+    await markRoomsMessagesAsRead(roomId, currentUserId?.toString() as string)
 
     const messages = await fetchRoomMessages(roomId)
 
@@ -83,6 +72,7 @@ export const getRoomMessages = async (req: Request, res: Response) => {
     }
 
     // If last message is from another user, notify the receiver
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const lastMessageSenderId = (room.lastMessage as any)?.sender?._id
     if (
       lastMessageSenderId &&

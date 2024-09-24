@@ -1,18 +1,21 @@
 import { useSocketContext } from '../context/useSocketContext'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useChatContext } from '../context/useChatContext'
 import { getMessagesService } from '../../services/room.service'
 
 const useGetMessages = () => {
-  const [loading, setLoading] = useState(false)
-  const { selectedRoom, setMessages, setTotalUnreadMessages, setRooms } =
-    useChatContext()
+  const {
+    selectedRoom,
+    setMessages,
+    setTotalUnreadMessages,
+    setRooms,
+    setLoadingMessages,
+  } = useChatContext()
   const { socket } = useSocketContext()
 
   useEffect(() => {
     const fetchMessages = async () => {
-      setLoading(true)
-
+      if (setLoadingMessages) setLoadingMessages(true)
       try {
         const response = await getMessagesService(selectedRoom?._id as string)
 
@@ -37,7 +40,6 @@ const useGetMessages = () => {
         //update total unread messages
         if (setTotalUnreadMessages) {
           setTotalUnreadMessages((prevCount) => {
-            console.log('prevCount', prevCount)
             return prevCount > unreadCount ? prevCount - unreadCount : 0
           })
         }
@@ -46,18 +48,22 @@ const useGetMessages = () => {
       } catch (error: unknown) {
         console.log(error)
       } finally {
-        setLoading(false)
+        if (setLoadingMessages) setLoadingMessages(false)
       }
     }
 
     if (selectedRoom) {
       setMessages([])
-
       fetchMessages()
     }
-  }, [selectedRoom, setMessages, socket, setTotalUnreadMessages, setRooms])
-
-  return { loading }
+  }, [
+    selectedRoom,
+    setMessages,
+    socket,
+    setTotalUnreadMessages,
+    setRooms,
+    setLoadingMessages,
+  ])
 }
 
 export default useGetMessages

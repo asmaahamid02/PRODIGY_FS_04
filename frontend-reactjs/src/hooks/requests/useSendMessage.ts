@@ -17,7 +17,7 @@ const useSendMessage = () => {
       }
 
       //update the last message of the room (on the sender side)
-      updateLastMessage(response)
+      updateLastMessage(response, false)
 
       //update messages array
       setMessages((prevMessages) => [...prevMessages, response])

@@ -9,7 +9,7 @@ const NewChatModal = forwardRef<HTMLDialogElement>((_, ref) => {
 
   return (
     <dialog ref={ref} className='modal max-w-full'>
-      <div className='modal-box'>
+      <div className='modal-box overflow-x-hidden'>
         <form method='dialog'>
           <button className='btn btn-sm btn-circle btn-ghost absolute right-2 top-2'>
             <IoMdClose />

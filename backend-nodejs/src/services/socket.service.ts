@@ -15,3 +15,18 @@ export const notifyReceiver = (
     )
   }
 }
+
+export const getUsersJoinedRoom = (roomId: string): string[] => {
+  const users: string[] = []
+  const socketIdsJoinedRoom = io.sockets.adapter.rooms.get(roomId)
+
+  if (socketIdsJoinedRoom) {
+    socketIdsJoinedRoom.forEach((socketId) => {
+      const userId = io.sockets.sockets.get(socketId)?.handshake.query
+        .userId as string
+      users.push(userId)
+    })
+  }
+
+  return users
+}

@@ -13,14 +13,14 @@ import { useThemeContext } from '../../../hooks/context/useThemeContext'
 const SendMessage = () => {
   const [message, setMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const { selectedRoom } = useChatContext()
+  const { selectedRoom, loadingMessages } = useChatContext()
   const { loading, sendMessage } = useSendMessage()
   const { sender } = useRoomInfo({ room: selectedRoom as IRoom })
   const { socket } = useSocketContext()
   const { theme } = useThemeContext()
 
   const handleSendMessage = async () => {
-    if (message.trim() === '') return
+    if (message.trim() === '' || loadingMessages) return
 
     await sendMessage(sender?._id as string, message)
     setMessage('')
@@ -30,7 +30,6 @@ const SendMessage = () => {
     setMessage(text)
 
     if (!isTyping) {
-      console.log('typing')
       setIsTyping(true)
 
       socket?.emit('typing', selectedRoom)
@@ -63,13 +62,14 @@ const SendMessage = () => {
             ? 'oklch(0.278078 0.029596 256.848)'
             : 'oklch(0.746477 0.0216 264.436)'
         }
+        onEnter={handleSendMessage}
       />
       {loading ? (
         <Spinner size='' />
       ) : (
         <button
           type='submit'
-          disabled={loading}
+          disabled={loading || loadingMessages}
           className='btn btn-ghost btn-sm'
           onClick={handleSendMessage}
         >

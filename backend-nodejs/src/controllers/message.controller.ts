@@ -1,16 +1,13 @@
 import { Request, Response } from 'express'
 import { getErrorMessage } from '../utils/error.util'
 import { validateRequiredFields } from '../utils/validation.util'
-import { notifyReceiver } from '../services/socket.service'
+import { getUsersJoinedRoom, notifyReceiver } from '../services/socket.service'
 import {
   getTotalUnreadMessages,
   populateMessageForResponse,
   updateMessageReadStatus,
 } from '../services/message.service'
-import {
-  findOrCreateRoom,
-  findRoomByParticipants,
-} from '../services/room.service'
+import { findRoomByParticipants } from '../services/room.service'
 import Message from '../models/message.model'
 
 export const sendMessage = async (req: Request, res: Response) => {
@@ -65,31 +62,24 @@ export const sendMessage = async (req: Request, res: Response) => {
     // Populate necessary fields for the response
     await populateMessageForResponse(newMessage)
 
-    // Notify receiver about new room or message
-    // if (isNewRoom) {
-    //   room = await room.populate([
-    //     { path: 'groupAdmin', select: '-password' },
-    //     { path: 'participants', select: '-password' },
-    //     {
-    //       path: 'lastMessage',
-    //       populate: { path: 'sender', select: '-password' },
-    //     },
-    //   ])
+    room.participants.forEach((participant) => {
+      if (participant._id.toString() === senderId.toString()) {
+        return
+      }
 
-    //   notifyReceiver(receiverId, 'roomCreated', room)
-    // }
+      notifyReceiver(participant._id.toString(), 'messageReceived', newMessage)
+    })
 
-    // room.participants.forEach((participant) => {
-    //   if (participant._id.toString() === senderId.toString()) {
-    //     return
-    //   }
-
-    //   notifyReceiver(participant._id.toString(), 'messageReceived', newMessage)
-    // })
-
-    //notify receiver about unread messages count
-    // const totalUnreadMessages = await getTotalUnreadMessages(receiverId)
-    // notifyReceiver(receiverId, 'unreadMessagesCount', totalUnreadMessages)
+    //send total unread messages to the receivers
+    const usersJoiningRoom = getUsersJoinedRoom(room._id.toString())
+    const usersOutsideRoom = room.participants.filter(
+      (participant) => !usersJoiningRoom.includes(participant._id.toString())
+    )
+    if (usersOutsideRoom.length > 0) {
+      //notify receiver about unread messages count
+      const totalUnreadMessages = await getTotalUnreadMessages(receiverId)
+      notifyReceiver(receiverId, 'unreadMessagesCount', totalUnreadMessages)
+    }
 
     return res.status(201).json(newMessage)
   } catch (error) {

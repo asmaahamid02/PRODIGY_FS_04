@@ -5,7 +5,7 @@ import { useChatContext } from '../context/useChatContext'
 
 const useGetRoom = () => {
   const [loading, setLoading] = useState(false)
-  const { rooms, setRooms, setSelectedRoom } = useChatContext()
+  const { setRooms, setSelectedRoom } = useChatContext()
 
   const getRoom = async (receiverId: string) => {
     setLoading(true)
@@ -18,7 +18,7 @@ const useGetRoom = () => {
 
       if (response.isNew) {
         //insert the new room at the beginning of the array
-        setRooms([response.room, ...rooms])
+        setRooms((previousRooms) => [response.room, ...previousRooms])
       }
 
       setSelectedRoom(response.room)

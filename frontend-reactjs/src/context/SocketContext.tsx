@@ -36,7 +36,7 @@ const SocketContextProvider = ({ children }: { children: ReactNode }) => {
   }>()
   const { authUser } = useAuthContext()
 
-  //connect socket and get online users
+  //connect socket
   useEffect(() => {
     if (authUser) {
       const newSocket = io(import.meta.env.VITE_SERVER_URL as string, {
@@ -55,21 +55,24 @@ const SocketContextProvider = ({ children }: { children: ReactNode }) => {
         console.log('Socket disconnected')
       })
 
-      newSocket.on('getOnlineUsers', (users: string[]) => {
-        setOnlineUsers(users)
-      })
-
       return () => {
         newSocket.close()
       }
     } else {
-      if (socket) {
-        socket.disconnect()
-        setSocket(null)
-      }
+      socket?.disconnect()
+      setSocket(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser])
+
+  //get online users
+  useEffect(() => {
+    if (!socket) return
+
+    socket.on('getOnlineUsers', (users: string[]) => {
+      setOnlineUsers(users)
+    })
+  }, [socket])
 
   //typing listeners
   useEffect(() => {

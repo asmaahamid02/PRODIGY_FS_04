@@ -22,7 +22,7 @@ export const getTotalUnreadMessages = async (userId: string) => {
     console.log(
       getErrorMessage(
         error,
-        'Error in Message Controller - getTotalUnreadMessages API'
+        'Error in Message Controller - getTotalUnreadMessages service'
       )
     )
     return 0
@@ -30,7 +30,7 @@ export const getTotalUnreadMessages = async (userId: string) => {
 }
 
 // Mark messages as read for the room
-export const markMessagesAsRead = async (
+export const markRoomsMessagesAsRead = async (
   roomId: string,
   currentUserId: string
 ) => {
@@ -93,4 +93,30 @@ export const populateMessageForResponse = async (message: any) => {
       ],
     },
   ])
+}
+
+export const getUnreadMessages = async (userId: string) => {
+  try {
+    const rooms = await Room.find({ participants: userId }).select('_id')
+
+    if (!rooms) {
+      return []
+    }
+
+    const unreadMessages = await Message.find({
+      room: { $in: rooms },
+      'readBy.reader': { $ne: userId },
+      sender: { $ne: userId },
+    })
+
+    return unreadMessages
+  } catch (error) {
+    console.log(
+      getErrorMessage(
+        error,
+        'Error in Message Controller - getUnreadMessages service'
+      )
+    )
+    return 0
+  }
 }

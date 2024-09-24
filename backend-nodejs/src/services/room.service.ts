@@ -66,6 +66,21 @@ export const findRoomByParticipants = async (participants: string[]) => {
   ])
 }
 
+export const findParticipantRooms = async (userId: string) => {
+  return await Room.find({
+    participants: userId,
+  })
+    .populate([
+      { path: 'participants', select: '-password' },
+      { path: 'groupAdmin', select: '-password' },
+      {
+        path: 'lastMessage',
+        populate: { path: 'sender', select: '-password' },
+      },
+    ])
+    .sort({ updatedAt: -1 })
+}
+
 // const rooms = await Room.aggregate([
 //   {
 //     $match: {

@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import { useAuthContext } from '../../../hooks/context/useAuthContext'
 import { isDateLessThanHoursAgo } from '../../../utils/date.util'
 import { IUser } from '../../../types/user.type'
 import useGetRoom from '../../../hooks/requests/useGetRoom'
@@ -12,11 +11,10 @@ interface UserItemProps {
 }
 
 const UserItem: FC<UserItemProps> = ({ user }) => {
-  const { authUser } = useAuthContext()
   const { loading, getRoom } = useGetRoom()
   const { closeModal } = useModalContext()
 
-  const isNew = isDateLessThanHoursAgo(authUser?.createdAt as string)
+  const isNew = isDateLessThanHoursAgo(user.createdAt as string, 24)
 
   const handleUserClick = async () => {
     if (loading) return
@@ -26,7 +24,7 @@ const UserItem: FC<UserItemProps> = ({ user }) => {
 
   return (
     <div
-      className={`flex items-center justify-between w-full p-2 rounded-lg hover:bg-base-300 cursor-pointer transition-colors bg-base-100`}
+      className={`flex items-center justify-between w-full p-2 rounded-lg hover:bg-base-300 cursor-pointer transition-colors bg-base-100 max-w-full`}
       role='button'
       onClick={handleUserClick}
     >
@@ -41,7 +39,7 @@ const UserItem: FC<UserItemProps> = ({ user }) => {
       </div>
       {isNew && (
         <div className='space-y-2 flex flex-col items-end'>
-          <div className='badge badge-accent'>new</div>
+          <div className='badge badge-secondary'>new</div>
         </div>
       )}
       {loading && <Spinner />}

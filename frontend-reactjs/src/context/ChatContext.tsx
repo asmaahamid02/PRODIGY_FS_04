@@ -3,12 +3,12 @@ import {
   Dispatch,
   ReactNode,
   SetStateAction,
+  useCallback,
   useEffect,
   useState,
 } from 'react'
 import { IMessage, IRoom } from '../types/chat.type'
 import { useSocketContext } from '../hooks/context/useSocketContext'
-import { IUser } from '../types/user.type'
 
 type TChatContext = {
   selectedRoom: IRoom | null
@@ -20,6 +20,8 @@ type TChatContext = {
   totalUnreadMessages?: number
   setTotalUnreadMessages?: Dispatch<SetStateAction<number>>
   updateLastMessage: (newMessage: IMessage, updateUnreadCount?: boolean) => void
+  loadingMessages?: boolean
+  setLoadingMessages?: Dispatch<SetStateAction<boolean>>
 }
 
 const initialState: TChatContext = {
@@ -34,75 +36,53 @@ const initialState: TChatContext = {
 
 export const ChatContext = createContext<TChatContext>(initialState)
 
-const ChatContextProvider = ({
-  children,
-  authUser,
-}: {
-  children: ReactNode
-  authUser: IUser | null
-}) => {
+const ChatContextProvider = ({ children }: { children: ReactNode }) => {
   const [selectedRoom, setSelectedRoom] = useState<IRoom | null>(null)
   const [messages, setMessages] = useState<IMessage[]>([])
+  const [loadingMessages, setLoadingMessages] = useState<boolean>(false)
   const [rooms, setRooms] = useState<IRoom[]>([])
   const [totalUnreadMessages, setTotalUnreadMessages] = useState<number>(0)
   const { socket } = useSocketContext()
 
-  const updateLastMessage = (
-    newMessage: IMessage,
-    updateUnreadCount: boolean = false
-  ) => {
-    const newRooms = [...rooms]
-    const roomIndex = newRooms.findIndex(
-      (r) => r._id === (newMessage.room as IRoom)._id
-    )
+  const updateLastMessage = useCallback(
+    (newMessage: IMessage, updateUnreadCount: boolean = false) => {
+      const timeout = setTimeout(() => {
+        setRooms((prevRooms) => {
+          const roomIndex = prevRooms.findIndex(
+            (r) => r._id === (newMessage.room as IRoom)._id
+          )
 
-    if (roomIndex === -1) return
+          if (roomIndex === -1) return prevRooms
 
-    newRooms[roomIndex].lastMessage = (newMessage.room as IRoom).lastMessage
+          const updatedRooms = [...prevRooms]
+          updatedRooms[roomIndex] = {
+            ...updatedRooms[roomIndex],
+            lastMessage: (newMessage.room as IRoom).lastMessage,
+          }
 
-    if (updateUnreadCount) {
-      const messageRoom = newMessage.room as IRoom
-      const isDifferentRoom = selectedRoom?._id !== messageRoom._id
-      const unreadCount = newRooms[roomIndex].unreadCount as number
+          if (updateUnreadCount) {
+            const messageRoom = newMessage.room as IRoom
+            const isDifferentRoom = selectedRoom?._id !== messageRoom._id
+            const unreadCount =
+              (updatedRooms[roomIndex].unreadCount as number) || 0
 
-      if (isDifferentRoom) {
-        newRooms[roomIndex].unreadCount = unreadCount + 1
+            if (isDifferentRoom) {
+              updatedRooms[roomIndex] = {
+                ...updatedRooms[roomIndex],
+                unreadCount: unreadCount + 1,
+              }
+            }
+          }
+          return updatedRooms
+        })
+      }, 500)
+
+      return () => {
+        clearTimeout(timeout)
       }
-    }
-
-    setRooms(newRooms)
-
-    // setRooms((prevRooms) => {
-    //   console.log('updateLastMessage called with:', newMessage)
-
-    //   const roomIndex = prevRooms.findIndex(
-    //     (r) => r._id === (newMessage.room as IRoom)._id
-    //   )
-
-    //   if (roomIndex === -1) return prevRooms
-
-    //   const updatedRooms = [...prevRooms]
-    //   updatedRooms[roomIndex].lastMessage = (
-    //     newMessage.room as IRoom
-    //   ).lastMessage
-
-    //   if (updateUnreadCount) {
-    //     const messageRoom = newMessage.room as IRoom
-    //     const isDifferentRoom = selectedRoom?._id !== messageRoom._id
-    //     const unreadCount = updatedRooms[roomIndex].unreadCount as number
-    //     // const isMoreThanTotalUnreadMessages = unreadCount > totalUnreadMessages
-
-    //     if (isDifferentRoom) {
-    //       console.log(
-    //         'unreadCount updated',
-    //         updatedRooms[roomIndex].unreadCount
-    //       )
-    //       updatedRooms[roomIndex].unreadCount = unreadCount + 1
-    //     }
-    //   }
-    //   return updatedRooms
-    // })
-  }
+    },
+    [selectedRoom]
+  )
 
   useEffect(() => {
     if (selectedRoom) {
@@ -122,6 +102,8 @@ const ChatContextProvider = ({
         totalUnreadMessages,
         setTotalUnreadMessages,
         updateLastMessage,
+        loadingMessages,
+        setLoadingMessages,
       }}
     >
       {children}
