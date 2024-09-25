@@ -1,10 +1,8 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FiImage } from 'react-icons/fi'
 import { IoSend } from 'react-icons/io5'
 import useSendMessage from '../../../hooks/requests/useSendMessage'
-import useRoomInfo from '../../../hooks/useRoomInfo'
 import { useChatContext } from '../../../hooks/context/useChatContext'
-import { IRoom } from '../../../types/chat.type'
 import Spinner from '../../utils/Spinner'
 import { useSocketContext } from '../../../hooks/context/useSocketContext'
 import InputEmoji from 'react-input-emoji'
@@ -15,31 +13,40 @@ const SendMessage = () => {
   const [isTyping, setIsTyping] = useState(false)
   const { selectedRoom, loadingMessages } = useChatContext()
   const { loading, sendMessage } = useSendMessage()
-  const { sender } = useRoomInfo({ room: selectedRoom as IRoom })
   const { socket } = useSocketContext()
   const { theme } = useThemeContext()
 
   const handleSendMessage = async () => {
     if (message.trim() === '' || loadingMessages) return
 
-    await sendMessage(sender?._id as string, message)
+    await sendMessage(selectedRoom?._id as string, message)
     setMessage('')
   }
 
-  const handleTyping = (text: string) => {
-    setMessage(text)
+  const handleTyping = useCallback(
+    (text: string) => {
+      setMessage(text)
 
-    if (!isTyping) {
-      setIsTyping(true)
+      if (!isTyping) {
+        setIsTyping(true)
 
-      socket?.emit('typing', selectedRoom)
+        socket?.emit('typing', selectedRoom)
 
-      setTimeout(() => {
-        socket?.emit('stopTyping', selectedRoom)
-        setIsTyping(false)
-      }, 3000)
+        setTimeout(() => {
+          socket?.emit('stopTyping', selectedRoom)
+          setIsTyping(false)
+        }, 3000)
+      }
+    },
+    [isTyping, selectedRoom, socket]
+  )
+
+  useEffect(() => {
+    if (selectedRoom) {
+      setIsTyping(false)
+      setMessage('')
     }
-  }
+  }, [selectedRoom])
 
   return (
     <form className='flex gap-2 shrink-0 px-3 py-2 items-center justify-between w-full border-t-base-300 border-t'>

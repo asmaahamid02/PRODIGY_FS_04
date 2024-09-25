@@ -51,7 +51,7 @@ export const updateMessageReaders = async (
           message.readBy = []
         }
         message.readBy.push({
-          reader: new Types.ObjectId(userId as string),
+          reader: new Types.ObjectId((userId as string) ?? ''),
           readAt: new Date(),
         })
       }

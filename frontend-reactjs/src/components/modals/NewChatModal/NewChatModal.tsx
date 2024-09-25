@@ -3,9 +3,10 @@ import { forwardRef, useState } from 'react'
 import DirectChatsTab from '../../Chat/DirectChatsTab'
 import GroupChatsTab from '../../Chat/GroupChatsTab'
 import { IoMdClose } from 'react-icons/io'
+import Tabs from '../../utils/Tabs'
 
 const NewChatModal = forwardRef<HTMLDialogElement>((_, ref) => {
-  const [selectedTab] = useState(0)
+  const [selectedTab, setSelectedTab] = useState(0)
 
   return (
     <dialog ref={ref} className='modal max-w-full'>
@@ -17,11 +18,11 @@ const NewChatModal = forwardRef<HTMLDialogElement>((_, ref) => {
         </form>
         <h3 className='font-bold text-lg'>Start New Chat</h3>
         <div className='flex flex-col gap-2 mt-2'>
-          {/* <Tabs
+          <Tabs
             tabs={['Direct', 'Group']}
             selectedTab={selectedTab}
             setSelectedTab={setSelectedTab}
-          /> */}
+          />
 
           <div className='mt-4' role='tabpanel'>
             {selectedTab === 0 ? <DirectChatsTab /> : <GroupChatsTab />}

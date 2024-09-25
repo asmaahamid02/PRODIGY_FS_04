@@ -8,8 +8,9 @@ interface IRoomItemProps {
 }
 
 const RoomItem: FC<IRoomItemProps> = ({ room }) => {
-  const { setSelectedRoom } = useChatContext()
+  const { setSelectedRoom, notifications } = useChatContext()
   const {
+    isGroup,
     chatName,
     profilePicture,
     lastMessageText,
@@ -18,10 +19,13 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
     isOnline,
     typing,
     typingUser,
-    unreadCount,
+    lastMessage,
     isLastMessageRead,
     isLastMessageSentByMe,
   } = useRoomInfo({ room })
+
+  const unreadCount =
+    notifications.find((n) => n._id === room._id)?.unreadCount ?? 0
 
   return (
     <div
@@ -37,13 +41,14 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
           src={profilePicture as string}
           alt={chatName as string}
           isOnline={isOnline}
+          displayOnline={!isGroup}
         />
 
         <div className='flex-1 overflow-hidden'>
           <h4 className='md:text-lg font-bold truncate'>{chatName}</h4>
           {typing ? (
             <p className='text-sm text-base-400 flex items-center gap-1 text-accent'>
-              {typingUser && `${typingUser.fullName} is`} typing
+              {typingUser && `${typingUser.fullName.split(' ')[0]} is`} typing
               <span className='loading loading-dots loading-sm'></span>
             </p>
           ) : (
@@ -52,9 +57,14 @@ const RoomItem: FC<IRoomItemProps> = ({ room }) => {
                 !isLastMessageRead && 'text-accent'
               }`}
             >
-              {isLastMessageSentByMe && (
+              {isLastMessageSentByMe ? (
                 <span className='font-medium'>You: </span>
-              )}
+              ) : isGroup && lastMessage ? (
+                <span className='font-medium'>
+                  {lastMessage.sender.fullName.split(' ')[0]}
+                  {': '}
+                </span>
+              ) : null}
               {lastMessageText.length > 50
                 ? lastMessageText.substring(0, 51)
                 : lastMessageText}

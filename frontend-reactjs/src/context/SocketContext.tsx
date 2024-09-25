@@ -55,6 +55,10 @@ const SocketContextProvider = ({ children }: { children: ReactNode }) => {
         console.log('Socket disconnected')
       })
 
+      newSocket.on('error', () => {
+        console.log('Socket error: ')
+      })
+
       return () => {
         newSocket.close()
       }
@@ -79,6 +83,7 @@ const SocketContextProvider = ({ children }: { children: ReactNode }) => {
     socket?.on(
       'typingReceived',
       ({ userId, roomId }: { userId: string; roomId: string }) => {
+        console.log('typingReceived', userId, roomId)
         if (userId !== authUser?._id) {
           setTyping(true)
           setTypingInfo({ userId, roomId })

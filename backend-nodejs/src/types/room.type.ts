@@ -14,6 +14,7 @@ export interface IRoom {
   groupAdmin?: Types.ObjectId | IUser | null
 }
 
-export interface IRoomDocument extends IRoom, Document {
-  _id: Types.ObjectId
+export interface IGroupRequest {
+  name: string
+  users?: string[] | null
 }

@@ -52,13 +52,13 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
     ? room.participants.find((user) => user._id === typingInfo?.userId)
     : null
 
-  //get unread messages count
-  const unreadCount = room?.unreadCount
-
+  console.log('typingInfo', typingInfo)
+  console.log('selectedRoom', selectedRoom)
   return {
     sender,
     chatName,
     isGroup,
+    lastMessage,
     lastMessageText,
     lastMessageTime,
     profilePicture,
@@ -66,7 +66,6 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
     isOnline,
     typing: typing && typingInfo?.roomId === room._id,
     typingUser,
-    unreadCount,
     isLastMessageRead,
     isLastMessageSentByMe,
   }

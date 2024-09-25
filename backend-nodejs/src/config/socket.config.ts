@@ -3,6 +3,7 @@ import http from 'http'
 import { Server } from 'socket.io'
 import { IRoom } from '../types/room.type'
 import { getNotificationsQuery } from '../services/notification.service'
+import { notifyReceiver } from '../services/socket.service'
 
 const app = express()
 
@@ -43,6 +44,17 @@ io.on('connection', async (socket) => {
     ;(socket as unknown as { roomId: string }).roomId = roomId
   })
 
+  //update room
+  socket.on('updateRoom', (room: IRoom) => {
+    room.participants.forEach((participant) => {
+      if (participant._id.toString() === userId) {
+        return
+      }
+
+      notifyReceiver(participant._id.toString(), 'roomUpdated', room)
+    })
+  })
+
   //typing
   socket.on('typing', (room: IRoom) => {
     room.participants.forEach((participant) => {
@@ -50,12 +62,10 @@ io.on('connection', async (socket) => {
         return
       }
 
-      const receiverSocketId = getReceiverSocketId(
-        participant._id.toString()
-      ) as string
-      socket
-        .in(receiverSocketId)
-        .emit('typingReceived', { roomId: room._id.toString(), userId })
+      notifyReceiver(participant._id.toString(), 'typingReceived', {
+        roomId: room._id.toString(),
+        userId,
+      })
     })
   })
 
@@ -65,12 +75,10 @@ io.on('connection', async (socket) => {
         return
       }
 
-      const receiverSocketId = getReceiverSocketId(
-        participant._id.toString()
-      ) as string
-      socket
-        .in(receiverSocketId)
-        .emit('stopTypingReceived', { roomId: room._id.toString(), userId })
+      notifyReceiver(participant._id.toString(), 'stopTypingReceived', {
+        roomId: room._id.toString(),
+        userId,
+      })
     })
   })
 

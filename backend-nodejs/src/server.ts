@@ -10,11 +10,11 @@ import { IUser } from './types/user.type'
 import cors from 'cors'
 import { app, server } from './config/socket.config'
 import path from 'path'
+import { getErrorMessage } from './utils/error.util'
 
 dotenv.config()
 
 const port = process.env.PORT || 8000
-
 const BASEDIR = path.resolve()
 
 //add user property to Request interface
@@ -43,7 +43,14 @@ app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.join(BASEDIR, 'frontend-reactjs', 'dist', 'index.html'))
 })
 
-server.listen(port, () => {
-  connectToDB()
-  console.log(`Server is running at port ${port}`)
-})
+connectToDB()
+  .then(() => {
+    console.log('Connected to MongoDB successfully!')
+
+    server.listen(port, async () => {
+      console.log(`Server is running at port ${port}`)
+    })
+  })
+  .catch((error) =>
+    console.log(getErrorMessage(error, 'Failed to connect to MongoDB!'))
+  )

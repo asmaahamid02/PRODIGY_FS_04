@@ -8,11 +8,11 @@ const useSendMessage = () => {
   const { setMessages, updateLastMessage, selectedRoom } = useChatContext()
   const { socket } = useSocketContext()
 
-  const sendMessage = async (receiverId: string, message: string) => {
+  const sendMessage = async (roomId: string, message: string) => {
     setLoading(true)
     socket?.emit('joinRoom', selectedRoom?._id)
     try {
-      const response = await sendMessageService(receiverId, message)
+      const response = await sendMessageService(roomId, message)
 
       if ('error' in response) {
         throw new Error(response.error)

@@ -30,3 +30,36 @@ export const getMessagesService = async (
   const response = await api.get(`${API_ENDPOINTS.ROOMS}/${roomId}/messages`)
   return response.data
 }
+
+export const createGroupService = async (
+  name: string,
+  users: string[]
+): Promise<
+  | IRoom
+  | {
+      error: string
+    }
+> => {
+  const response = await api.post(`${API_ENDPOINTS.ROOMS}/group`, {
+    name,
+    users,
+  })
+  return response.data
+}
+
+export const updateGroupService = async (
+  roomId: string,
+  name: string,
+  users: string[]
+): Promise<
+  | IRoom
+  | {
+      error: string
+    }
+> => {
+  const response = await api.post(`${API_ENDPOINTS.ROOMS}/group/${roomId}`, {
+    name,
+    users,
+  })
+  return response.data
+}

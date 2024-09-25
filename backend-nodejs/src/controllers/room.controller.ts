@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { getErrorMessage } from '../utils/error.util'
 import User from '../models/user.model'
-import Message from '../models/message.model'
 import { notifyReceiver } from '../services/socket.service'
 import {
   findOrCreateRoomByParticipants,
@@ -12,34 +11,16 @@ import {
   markRoomsMessagesAsRead,
   fetchRoomMessages,
 } from '../services/message.service'
+import { IGroupRequest } from '../types/room.type'
+import { validateRequiredFields } from '../utils/validation.util'
+import Room from '../models/room.model'
 export const getRooms = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id
 
     const rooms = await findParticipantRooms(userId?.toString() || '')
 
-    const unreadMessagesCountMap = new Map<string, number>()
-
-    await Promise.all(
-      rooms.map(async (room) => {
-        const count = await Message.countDocuments({
-          room: room._id,
-          sender: { $ne: userId },
-          'readBy.reader': { $ne: userId },
-        })
-
-        unreadMessagesCountMap.set(room.id, count)
-      })
-    )
-
-    const roomsWithUnreadCount = rooms.map((room) => {
-      return {
-        ...room.toObject(),
-        unreadCount: unreadMessagesCountMap.get(room.id),
-      }
-    })
-
-    return res.status(200).json(roomsWithUnreadCount)
+    return res.status(200).json(rooms)
   } catch (error: unknown) {
     console.log(
       getErrorMessage(error, 'Error in Room Controller - getRooms API')
@@ -113,10 +94,156 @@ export const getRoom = async (req: Request, res: Response) => {
       receiverId,
     ])
 
+    if (isNew) {
+      room.participants.forEach((participant) => {
+        if (participant._id.toString() === currentUserId?.toString()) {
+          return
+        }
+
+        notifyReceiver(participant._id.toString(), 'newRoom', room)
+      })
+    }
+
     return res.status(200).json({ room, isNew })
   } catch (error: unknown) {
     console.log(
       getErrorMessage(error, 'Error in Room Controller - getRoom API')
+    )
+    return res.status(500).json({ error: 'Internal Server Error!' })
+  }
+}
+
+export const createGroup = async (req: Request, res: Response) => {
+  try {
+    const validateRequiredFieldsResponse = validateRequiredFields(req.body, [
+      'name',
+    ])
+
+    if (!validateRequiredFieldsResponse.valid) {
+      return res
+        .status(400)
+        .json({ error: validateRequiredFieldsResponse.message })
+    }
+
+    const userId = req.user?._id
+    const { name, users }: IGroupRequest = req.body
+
+    if (name.trim().length < 3) {
+      return res
+        .status(400)
+        .json({ error: 'Group name must be at least 3 characters' })
+    }
+
+    if (!users || users.length < 2) {
+      return res.status(400).json({ error: 'Group must have at least 2 users' })
+    }
+
+    const foundUsers = await User.find({ _id: { $in: users } }).select('_id')
+
+    if (!foundUsers) {
+      return res.status(400).json({ error: 'No valid users found!' })
+    }
+
+    let room = await Room.create({
+      groupName: name,
+      participants: [userId, ...foundUsers],
+      isGroup: true,
+      groupAdmin: userId,
+    })
+
+    room = await room.populate([
+      { path: 'participants', select: '-password' },
+      { path: 'groupAdmin', select: '-password' },
+      {
+        path: 'lastMessage',
+        populate: { path: 'sender', select: '-password' },
+      },
+    ])
+
+    room.participants.forEach((participant) => {
+      if (participant._id.toString() === userId?.toString()) {
+        return
+      }
+
+      notifyReceiver(participant._id.toString(), 'newRoom', room)
+    })
+
+    return res.status(201).send(room)
+  } catch (error: unknown) {
+    console.log(
+      getErrorMessage(error, 'Error in Room Controller - createGroup API')
+    )
+    return res.status(500).json({ error: 'Internal Server Error!' })
+  }
+}
+
+export const updateGroup = async (req: Request, res: Response) => {
+  try {
+    const validateRequiredFieldsResponse = validateRequiredFields(req.body, [
+      'name',
+    ])
+
+    if (!validateRequiredFieldsResponse.valid) {
+      return res
+        .status(400)
+        .json({ error: validateRequiredFieldsResponse.message })
+    }
+
+    const userId = req.user?._id
+    const roomId = req.params.roomId
+    const { name, users }: IGroupRequest = req.body
+
+    if (!roomId || !userId) {
+      res.status(400).json({ error: 'roomId is required!' })
+    }
+
+    if (name.trim().length < 3) {
+      return res
+        .status(400)
+        .json({ error: 'Group name must be at least 3 characters' })
+    }
+
+    if (!users || users.length < 2) {
+      return res.status(400).json({ error: 'Group must have at least 2 users' })
+    }
+
+    const foundUsers = await User.find({ _id: { $in: users } }).select('_id')
+
+    if (!foundUsers) {
+      return res.status(400).json({ error: 'No valid users found!' })
+    }
+
+    const room = await Room.findByIdAndUpdate(
+      roomId,
+      {
+        $set: { participants: [userId, ...foundUsers], groupName: name },
+      },
+      { new: true }
+    ).populate([
+      { path: 'participants', select: '-password' },
+      { path: 'groupAdmin', select: '-password' },
+      {
+        path: 'lastMessage',
+        populate: { path: 'sender', select: '-password' },
+      },
+    ])
+
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found!' })
+    }
+
+    room.participants.forEach((participant) => {
+      if (participant._id.toString() === userId?.toString()) {
+        return
+      }
+
+      notifyReceiver(participant._id.toString(), 'newRoom', room)
+    })
+
+    return res.status(201).send(room)
+  } catch (error: unknown) {
+    console.log(
+      getErrorMessage(error, 'Error in Room Controller - createGroup API')
     )
     return res.status(500).json({ error: 'Internal Server Error!' })
   }

@@ -4,6 +4,7 @@ import HomeNavbar from '../../components/navigation/HomeNavbar'
 import ModalContextProvider from '../../context/ModalContext'
 import useMessageListener from '../../hooks/listener/useMessageListener'
 import useNotificationListener from '../../hooks/listener/useNotificationListener'
+import useRoomListener from '../../hooks/listener/useRoomListener'
 import useLogout from '../../hooks/requests/useLogout'
 import axiosInterceptor from '../../services/api.service'
 
@@ -13,6 +14,7 @@ const HomePage = () => {
   //messages listener
   useNotificationListener()
   useMessageListener()
+  useRoomListener()
 
   return (
     <ModalContextProvider>

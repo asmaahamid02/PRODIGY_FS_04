@@ -6,19 +6,21 @@ interface ISearchInputProps {
   searchQuery: string
   handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void
   clearSearch: () => void
+  placeholder?: string
 }
 
 const SearchInput: FC<ISearchInputProps> = ({
   searchQuery,
   handleSearch,
   clearSearch,
+  placeholder = 'Search user..',
 }) => {
   return (
     <label className='input input-bordered flex items-center gap-2 rounded-full'>
       <input
         type='text'
         className='grow'
-        placeholder='Search chat..'
+        placeholder={placeholder}
         value={searchQuery}
         onChange={handleSearch}
       />

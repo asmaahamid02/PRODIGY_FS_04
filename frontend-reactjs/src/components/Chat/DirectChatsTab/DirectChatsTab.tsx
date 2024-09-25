@@ -3,6 +3,9 @@ import useSearchUsers from '../../../hooks/requests/useSearchUsers'
 import { useState } from 'react'
 import SearchInput from '../../inputs/SearchInput'
 import Spinner from '../../utils/Spinner'
+import { useModalContext } from '../../../hooks/context/useModalContext'
+import useGetRoom from '../../../hooks/requests/useGetRoom'
+import { IUser } from '../../../types/user.type'
 
 const DirectChatsTab = () => {
   const { users, loading, searchUsers } = useSearchUsers()
@@ -15,6 +18,15 @@ const DirectChatsTab = () => {
 
   const clearSearch = () => {
     setSearchQuery('')
+  }
+
+  const { loading: loadingRoom, getRoom } = useGetRoom()
+  const { closeModal } = useModalContext()
+
+  const handleUserClick = async (user: IUser) => {
+    if (loading) return
+    await getRoom(user._id)
+    closeModal()
   }
 
   return (
@@ -34,7 +46,12 @@ const DirectChatsTab = () => {
               {users.length > 0 ? (
                 <>
                   {users.map((user) => (
-                    <UserItem key={user._id} user={user} />
+                    <UserItem
+                      key={user._id}
+                      user={user}
+                      onClick={handleUserClick}
+                      loading={loadingRoom}
+                    />
                   ))}
                 </>
               ) : (

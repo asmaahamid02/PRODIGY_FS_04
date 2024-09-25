@@ -6,7 +6,7 @@ import {
   updateMessageReaders,
   updateRoomLastMessage,
 } from '../services/message.service'
-import { findRoomByParticipants } from '../services/room.service'
+import { findRoomById } from '../services/room.service'
 import Message from '../models/message.model'
 import {
   notifyRoomParticipants,
@@ -26,15 +26,15 @@ export const sendMessage = async (req: Request, res: Response) => {
     }
 
     const { message }: { message: string } = req.body
-    const receiverId = req.params.receiverId
+    const roomId = req.params.roomId
     const senderId = req.user?._id
 
-    if (!receiverId || !senderId) {
-      return res.status(400).json({ error: 'Participant Id is required!' })
+    if (!senderId || !roomId) {
+      return res.status(400).json({ error: 'Room Id is required!' })
     }
 
     // Find or create room
-    const room = await findRoomByParticipants([senderId.toString(), receiverId])
+    const room = await findRoomById(roomId)
     if (!room) {
       return res.status(404).json({ error: 'Room not found' })
     }
@@ -74,6 +74,9 @@ export const sendMessage = async (req: Request, res: Response) => {
     console.log(
       getErrorMessage(error, 'Error in Message Controller - SendMessage API')
     )
+    if (error instanceof Error) {
+      console.log(error.stack)
+    }
     return res.status(500).json({ error: 'Internal Server Error!' })
   }
 }
