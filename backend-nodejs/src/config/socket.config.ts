@@ -2,7 +2,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import { IRoom } from '../types/room.type'
-import { getTotalUnreadMessages } from '../services/message.service'
+import { getNotificationsQuery } from '../services/notification.service'
 
 const app = express()
 
@@ -35,6 +35,14 @@ io.on('connection', async (socket) => {
   // Online Users
   io.emit('getOnlineUsers', Array.from(userSocketMap.keys()))
 
+  //join room
+  socket.on('joinRoom', (roomId: string) => {
+    socket.join(roomId)
+
+    console.log(`User with Session ID: ${socket.id} joined Room ID: ${roomId}`)
+    ;(socket as unknown as { roomId: string }).roomId = roomId
+  })
+
   //typing
   socket.on('typing', (room: IRoom) => {
     room.participants.forEach((participant) => {
@@ -66,17 +74,9 @@ io.on('connection', async (socket) => {
     })
   })
 
-  // total unread messages
-  const totalUnreadMessages = await getTotalUnreadMessages(userId)
-  io.to(socket.id).emit('unreadMessagesCount', totalUnreadMessages)
-
-  //join room
-  socket.on('joinRoom', (roomId: string) => {
-    socket.join(roomId)
-
-    console.log(`User with Session ID: ${socket.id} joined Room ID: ${roomId}`)
-    ;(socket as unknown as { roomId: string }).roomId = roomId
-  })
+  //notifications
+  const notifications = await getNotificationsQuery(userId)
+  io.to(socket.id).emit('getNotifications', notifications)
 
   socket.on('disconnect', () => {
     console.log(`User with Session ID: ${socket.id} disconnected!`)

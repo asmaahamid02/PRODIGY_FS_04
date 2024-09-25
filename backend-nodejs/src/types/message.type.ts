@@ -5,8 +5,9 @@ import { IRoom } from './room.type'
 export interface IMessage {
   _id: Types.ObjectId
   message: string
-  sender: IUser
-  room: IRoom
+  sender: IUser | Types.ObjectId
+  room: IRoom | Types.ObjectId
   updatedAt: Date
   createdAt: Date
+  readBy?: { reader?: IUser | Types.ObjectId | null; readAt?: Date | null }[]
 }

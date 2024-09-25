@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt, { TokenExpiredError } from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 import { getErrorMessage } from '../utils/error.util'
 import { ITokenPayload } from '../types/auth.type'
@@ -35,7 +35,11 @@ const protectRoute = async (
     next()
   } catch (error: unknown) {
     console.log(getErrorMessage(error, 'Error in Protect Route Middleware'))
-    return res.status(500).json({ error: 'Internal Server Error!' })
+    if (error instanceof TokenExpiredError) {
+      return res.status(401).json({ error: 'Unauthorized - Token Expired' })
+    } else {
+      return res.status(500).json({ error: 'Internal Server Error!' })
+    }
   }
 }
 

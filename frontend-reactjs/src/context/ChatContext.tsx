@@ -17,11 +17,11 @@ type TChatContext = {
   setMessages: Dispatch<SetStateAction<IMessage[]>>
   rooms: IRoom[]
   setRooms: Dispatch<SetStateAction<IRoom[]>>
-  totalUnreadMessages?: number
-  setTotalUnreadMessages?: Dispatch<SetStateAction<number>>
   updateLastMessage: (newMessage: IMessage, updateUnreadCount?: boolean) => void
   loadingMessages?: boolean
   setLoadingMessages?: Dispatch<SetStateAction<boolean>>
+  notifications: IRoom[]
+  setNotifications: Dispatch<SetStateAction<IRoom[]>>
 }
 
 const initialState: TChatContext = {
@@ -32,6 +32,8 @@ const initialState: TChatContext = {
   rooms: [],
   setRooms: () => {},
   updateLastMessage: () => {},
+  notifications: [],
+  setNotifications: () => {},
 }
 
 export const ChatContext = createContext<TChatContext>(initialState)
@@ -41,7 +43,7 @@ const ChatContextProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<IMessage[]>([])
   const [loadingMessages, setLoadingMessages] = useState<boolean>(false)
   const [rooms, setRooms] = useState<IRoom[]>([])
-  const [totalUnreadMessages, setTotalUnreadMessages] = useState<number>(0)
+  const [notifications, setNotifications] = useState<IRoom[]>([])
   const { socket } = useSocketContext()
 
   const updateLastMessage = useCallback(
@@ -99,11 +101,11 @@ const ChatContextProvider = ({ children }: { children: ReactNode }) => {
         setMessages,
         rooms,
         setRooms,
-        totalUnreadMessages,
-        setTotalUnreadMessages,
         updateLastMessage,
         loadingMessages,
         setLoadingMessages,
+        notifications,
+        setNotifications,
       }}
     >
       {children}

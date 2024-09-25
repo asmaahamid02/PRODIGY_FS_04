@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { sendMessageService } from '../../services/message.service'
 import { useChatContext } from '../context/useChatContext'
+import { useSocketContext } from '../context/useSocketContext'
 
 const useSendMessage = () => {
   const [loading, setLoading] = useState(false)
-  const { setMessages, updateLastMessage } = useChatContext()
+  const { setMessages, updateLastMessage, selectedRoom } = useChatContext()
+  const { socket } = useSocketContext()
 
   const sendMessage = async (receiverId: string, message: string) => {
     setLoading(true)
-
+    socket?.emit('joinRoom', selectedRoom?._id)
     try {
       const response = await sendMessageService(receiverId, message)
 

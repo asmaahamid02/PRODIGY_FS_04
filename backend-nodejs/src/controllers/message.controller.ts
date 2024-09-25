@@ -1,14 +1,17 @@
 import { Request, Response } from 'express'
 import { getErrorMessage } from '../utils/error.util'
 import { validateRequiredFields } from '../utils/validation.util'
-import { getUsersJoinedRoom, notifyReceiver } from '../services/socket.service'
 import {
-  getTotalUnreadMessages,
   populateMessageForResponse,
-  updateMessageReadStatus,
+  updateMessageReaders,
+  updateRoomLastMessage,
 } from '../services/message.service'
 import { findRoomByParticipants } from '../services/room.service'
 import Message from '../models/message.model'
+import {
+  notifyRoomParticipants,
+  notifyUsersOutsideRoom,
+} from '../services/notification.service'
 
 export const sendMessage = async (req: Request, res: Response) => {
   try {
@@ -48,38 +51,23 @@ export const sendMessage = async (req: Request, res: Response) => {
     }
 
     // Update read status for the users in the room
-    await updateMessageReadStatus(
+    await updateMessageReaders(
       room._id.toString(),
       senderId.toString(),
       newMessage
     )
 
     // Update room's last message
-    room.lastMessage = newMessage._id
-    room.updatedAt = new Date()
-    await Promise.all([room.save(), newMessage.save()])
+    await updateRoomLastMessage(room, newMessage)
 
     // Populate necessary fields for the response
     await populateMessageForResponse(newMessage)
 
-    room.participants.forEach((participant) => {
-      if (participant._id.toString() === senderId.toString()) {
-        return
-      }
+    // Send message to the room participants
+    await notifyRoomParticipants(room, senderId.toString(), newMessage)
 
-      notifyReceiver(participant._id.toString(), 'messageReceived', newMessage)
-    })
-
-    //send total unread messages to the receivers
-    const usersJoiningRoom = getUsersJoinedRoom(room._id.toString())
-    const usersOutsideRoom = room.participants.filter(
-      (participant) => !usersJoiningRoom.includes(participant._id.toString())
-    )
-    if (usersOutsideRoom.length > 0) {
-      //notify receiver about unread messages count
-      const totalUnreadMessages = await getTotalUnreadMessages(receiverId)
-      notifyReceiver(receiverId, 'unreadMessagesCount', totalUnreadMessages)
-    }
+    //send notifications to the users who are not in the room
+    await notifyUsersOutsideRoom(room)
 
     return res.status(201).json(newMessage)
   } catch (error) {

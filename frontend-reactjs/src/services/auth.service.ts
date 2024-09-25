@@ -17,11 +17,3 @@ export const loginService = async (
   const response = await api.post(API_ENDPOINTS.LOGIN, data)
   return response.data
 }
-
-export const logoutService = async (): Promise<{
-  message: string
-  error: string
-}> => {
-  const response = await api.post(API_ENDPOINTS.LOGOUT)
-  return response.data
-}

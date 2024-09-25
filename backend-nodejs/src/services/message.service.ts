@@ -1,33 +1,8 @@
 import Message from '../models/message.model'
-import Room from '../models/room.model'
 import { io } from '../config/socket.config'
-import { getErrorMessage } from '../utils/error.util'
-
-export const getTotalUnreadMessages = async (userId: string) => {
-  try {
-    const rooms = await Room.find({ participants: userId }).select('_id')
-
-    if (!rooms) {
-      return 0
-    }
-
-    const unreadMessages = await Message.countDocuments({
-      room: { $in: rooms },
-      'readBy.reader': { $ne: userId },
-      sender: { $ne: userId },
-    })
-
-    return unreadMessages
-  } catch (error) {
-    console.log(
-      getErrorMessage(
-        error,
-        'Error in Message Controller - getTotalUnreadMessages service'
-      )
-    )
-    return 0
-  }
-}
+import { IRoom } from '../types/room.type'
+import { IMessage } from '../types/message.type'
+import { Document, Types } from 'mongoose'
 
 // Mark messages as read for the room
 export const markRoomsMessagesAsRead = async (
@@ -60,11 +35,11 @@ export const fetchRoomMessages = async (roomId: string) => {
     .sort({ createdAt: 1 })
 }
 
-// Function to handle socket logic for updating message read status
-export const updateMessageReadStatus = async (
+// Function to handle message read by users
+export const updateMessageReaders = async (
   roomId: string,
   senderId: string,
-  message: any
+  message: IMessage & Document
 ) => {
   const socketIdsJoinedRoom = io.sockets.adapter.rooms.get(roomId)
 
@@ -72,14 +47,22 @@ export const updateMessageReadStatus = async (
     socketIdsJoinedRoom.forEach((socketId) => {
       const userId = io.sockets.sockets.get(socketId)?.handshake.query.userId
       if (userId !== senderId) {
-        message.readBy.push({ reader: userId, readAt: new Date() })
+        if (!message.readBy) {
+          message.readBy = []
+        }
+        message.readBy.push({
+          reader: new Types.ObjectId(userId as string),
+          readAt: new Date(),
+        })
       }
     })
   }
 }
 
 // Function to populate message fields for the response
-export const populateMessageForResponse = async (message: any) => {
+export const populateMessageForResponse = async (
+  message: IMessage & Document
+) => {
   return message.populate([
     { path: 'sender', select: '-password' },
     {
@@ -95,28 +78,11 @@ export const populateMessageForResponse = async (message: any) => {
   ])
 }
 
-export const getUnreadMessages = async (userId: string) => {
-  try {
-    const rooms = await Room.find({ participants: userId }).select('_id')
-
-    if (!rooms) {
-      return []
-    }
-
-    const unreadMessages = await Message.find({
-      room: { $in: rooms },
-      'readBy.reader': { $ne: userId },
-      sender: { $ne: userId },
-    })
-
-    return unreadMessages
-  } catch (error) {
-    console.log(
-      getErrorMessage(
-        error,
-        'Error in Message Controller - getUnreadMessages service'
-      )
-    )
-    return 0
-  }
+export const updateRoomLastMessage = async (
+  room: IRoom & Document,
+  message: IMessage & Document
+) => {
+  room.lastMessage = message._id
+  room.updatedAt = new Date()
+  await Promise.all([room.save(), message.save()])
 }

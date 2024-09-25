@@ -2,6 +2,7 @@ import { RiLogoutCircleLine } from 'react-icons/ri'
 import useLogout from '../../../hooks/requests/useLogout'
 import ThemeSwitcher from '../../inputs/ThemeSwitcher'
 import { useAuthContext } from '../../../hooks/context/useAuthContext'
+import Notifications from '../../Notifications'
 
 const HomeNavbar = () => {
   const { logout, loading } = useLogout()
@@ -30,7 +31,11 @@ const HomeNavbar = () => {
         </div>
       </div>
       <div className='flex-none space-x-2'>
-        <h4 className='font-bold'>{authUser?.fullName}</h4>
+        <Notifications />
+        <div className='flex flex-col items-end'>
+          <h4 className='font-bold'>{authUser?.fullName}</h4>
+          <p className='text-xs'>{authUser?.username}</p>
+        </div>
         <div
           tabIndex={0}
           role='button'

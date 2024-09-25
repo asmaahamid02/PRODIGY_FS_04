@@ -14,7 +14,7 @@ const Avatar: FC<IAvatarProps> = ({
   isOnline = false,
 }) => {
   return (
-    <div className={`avatar ${isOnline ? 'online' : 'offline'}`}>
+    <div className={`shrink-0 avatar ${isOnline ? 'online' : 'offline'}`}>
       <div className={`rounded-full ${width}`}>
         <img src={src} alt={alt} />
       </div>
