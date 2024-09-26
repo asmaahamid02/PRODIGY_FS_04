@@ -9,6 +9,7 @@ const useRoomListener = () => {
   const { socket } = useSocketContext()
   const { authUser } = useAuthContext()
 
+  //listen for room updates
   useEffect(() => {
     socket?.on('roomUpdated', (room: IRoom) => {
       //check if the user is a participant in the room
@@ -32,6 +33,14 @@ const useRoomListener = () => {
           })
           return updatedRooms
         })
+
+        //update selected room if it is the same room
+        setSelectedRoom((prevRoom) => {
+          if (prevRoom?._id === room._id) {
+            return room
+          }
+          return prevRoom
+        })
       }
     })
 
@@ -40,6 +49,7 @@ const useRoomListener = () => {
     }
   }, [setRooms, socket, selectedRoom, authUser, setSelectedRoom])
 
+  //listen for new room
   useEffect(() => {
     socket?.on('newRoom', (room: IRoom) => {
       const isFound = rooms.some((r) => r._id === room._id)

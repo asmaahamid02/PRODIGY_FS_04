@@ -5,12 +5,14 @@ import { useChatContext } from '../../../hooks/context/useChatContext'
 import useRoomInfo from '../../../hooks/useRoomInfo'
 import { IRoom } from '../../../types/chat.type'
 import Avatar from '../../Avatar'
+import useGroupRequests from '../../../hooks/requests/useGroupRequests'
 
 const RoomInfoModal = forwardRef<HTMLDialogElement>((_, ref) => {
   const { selectedRoom } = useChatContext()
   const { chatName, profilePicture } = useRoomInfo({
     room: selectedRoom as IRoom,
   })
+  const { loading, leaveGroup } = useGroupRequests()
 
   return (
     <dialog ref={ref} className='modal max-w-full'>
@@ -21,7 +23,7 @@ const RoomInfoModal = forwardRef<HTMLDialogElement>((_, ref) => {
           </button>
         </form>
         <h3 className='font-bold text-lg'>{`${chatName} info`}</h3>
-        <div className='space-y-2 mt-2'>
+        <div className='space-y-4 mt-2'>
           <div className='flex items-center flex-col gap-2'>
             <Avatar
               src={profilePicture as string}
@@ -53,6 +55,17 @@ const RoomInfoModal = forwardRef<HTMLDialogElement>((_, ref) => {
               ))}
             </div>
           </div>
+          {selectedRoom?.isGroup && (
+            <div className='flex justify-end'>
+              <button
+                className='btn btn-error'
+                disabled={loading}
+                onClick={() => leaveGroup(selectedRoom._id)}
+              >
+                Leave Group
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <form method='dialog' className='modal-backdrop'>

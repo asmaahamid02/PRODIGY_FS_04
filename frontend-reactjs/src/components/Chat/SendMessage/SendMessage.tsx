@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FiImage } from 'react-icons/fi'
 import { IoSend } from 'react-icons/io5'
 import useSendMessage from '../../../hooks/requests/useSendMessage'

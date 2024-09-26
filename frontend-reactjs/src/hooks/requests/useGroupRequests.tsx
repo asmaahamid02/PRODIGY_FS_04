@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useChatContext } from '../context/useChatContext'
 import {
   createGroupService,
+  leaveGroupService,
   updateGroupService,
 } from '../../services/room.service'
 import { useSocketContext } from '../context/useSocketContext'
@@ -60,7 +61,27 @@ const useGroupRequests = () => {
       setLoading(false)
     }
   }
-  return { loading, createGroup, updateGroup }
+
+  const leaveGroup = async (roomId: string) => {
+    setLoading(true)
+    try {
+      const response = await leaveGroupService(roomId)
+
+      if ('error' in response) {
+        throw new Error(response.error)
+      }
+
+      setRooms((prev) => prev.filter((room) => room._id !== roomId))
+      setSelectedRoom(null)
+      socket?.emit('updateRoom', response)
+      toast.success('Group left successfully')
+    } catch (error: unknown) {
+      handleError(error, 'Error in useGroupRequests ~ leaveGroup')
+    } finally {
+      setLoading(false)
+    }
+  }
+  return { loading, createGroup, updateGroup, leaveGroup }
 }
 
 export default useGroupRequests

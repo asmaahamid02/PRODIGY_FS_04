@@ -63,3 +63,17 @@ export const updateGroupService = async (
   })
   return response.data
 }
+
+export const leaveGroupService = async (
+  roomId: string
+): Promise<
+  | IRoom
+  | {
+      error: string
+    }
+> => {
+  const response = await api.post(
+    `${API_ENDPOINTS.ROOMS}/group/${roomId}/leave`
+  )
+  return response.data
+}

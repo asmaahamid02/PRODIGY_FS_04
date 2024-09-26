@@ -207,3 +207,69 @@ export const updateGroup = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Internal Server Error!' })
   }
 }
+
+export const leaveGroup = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?._id
+    const roomId = req.params.roomId
+
+    if (!roomId || !userId) {
+      res.status(400).json({ error: 'roomId is required!' })
+    }
+
+    const room = await Room.findById(roomId)
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found!' })
+    }
+
+    //if the user is not a participant of the group
+    if (userId && !room.participants.includes(userId)) {
+      return res.status(400).json({ error: 'User is not a participant!' })
+    }
+
+    //if there is no participant left in the group, delete the room
+    if (room.participants.length === 1) {
+      await Room.findByIdAndDelete(roomId)
+      return res.status(200).json({ message: 'Room deleted successfully!' })
+    }
+
+    let roomAdmin = room.groupAdmin?.toString()
+    //if the admin is leaving the group, make the first participant as admin
+    if (room?.groupAdmin?.toString() === userId?.toString()) {
+      const newAdmin = room.participants.find(
+        (participant) => participant.toString() !== userId?.toString()
+      )
+
+      if (newAdmin) {
+        roomAdmin = newAdmin.toString()
+      }
+    }
+
+    const updatedRoom = await Room.findByIdAndUpdate(
+      roomId,
+      {
+        $pull: { participants: userId },
+        groupAdmin: roomAdmin,
+      },
+      { new: true }
+    ).populate([
+      { path: 'participants', select: '-password' },
+      { path: 'groupAdmin', select: '-password' },
+      {
+        path: 'lastMessage',
+        populate: { path: 'sender', select: '-password' },
+      },
+    ])
+
+    if (!updatedRoom) {
+      return res.status(404).json({ error: 'Room not found!' })
+    }
+
+    return res.status(201).send(updatedRoom)
+  } catch (error: unknown) {
+    console.log(
+      getErrorMessage(error, 'Error in Room Controller - leaveGroup API')
+    )
+    return res.status(500).json({ error: 'Internal Server Error!' })
+  }
+}
