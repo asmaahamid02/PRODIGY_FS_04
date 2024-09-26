@@ -3,7 +3,7 @@ import { API_ENDPOINTS } from '../utils/constants.util'
 import { api } from './api.service'
 
 export const sendMessageService = async (
-  receiverId: string,
+  roomId: string,
   message: string
 ): Promise<
   | IMessage
@@ -11,9 +11,8 @@ export const sendMessageService = async (
       error: string
     }
 > => {
-  const response = await api.post(
-    `${API_ENDPOINTS.MESSAGES}/send/${receiverId}`,
-    { message }
-  )
+  const response = await api.post(`${API_ENDPOINTS.MESSAGES}/send/${roomId}`, {
+    message,
+  })
   return response.data
 }

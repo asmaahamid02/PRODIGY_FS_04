@@ -1,12 +1,13 @@
 import { Types } from 'mongoose'
-import { IUserBasicInfo } from './user.type'
+import { IUser } from './user.type'
 import { IRoom } from './room.type'
 
 export interface IMessage {
   _id: Types.ObjectId
   message: string
-  sender: IUserBasicInfo
-  room: IRoom
+  sender: IUser | Types.ObjectId
+  room: IRoom | Types.ObjectId
   updatedAt: Date
   createdAt: Date
+  readBy?: { reader?: IUser | Types.ObjectId | null; readAt?: Date | null }[]
 }

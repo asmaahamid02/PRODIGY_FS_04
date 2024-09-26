@@ -1,27 +1,4 @@
-import Message from '../models/message.model'
 import Room from '../models/room.model'
-
-export const findOrCreateRoom = async (
-  senderId: string,
-  receiverId: string
-) => {
-  let room = await Room.findOne({
-    participants: { $all: [senderId, receiverId] },
-  })
-
-  if (!room) {
-    room = await Room.create({
-      participants: [senderId, receiverId],
-    })
-  }
-
-  room = await room.populate([
-    { path: 'participants', select: '-password' },
-    { path: 'lastMessage', populate: { path: 'sender', select: '-password' } },
-  ])
-
-  return room
-}
 
 export const findRoomById = async (roomId: string) => {
   return await Room.findById(roomId).populate([
@@ -31,8 +8,56 @@ export const findRoomById = async (roomId: string) => {
   ])
 }
 
+export const findOrCreateRoomByParticipants = async (
+  participants: string[]
+) => {
+  let isNew = false
+  let room = await Room.findOne({
+    participants: { $all: participants },
+    isGroup: false,
+  })
 
+  if (!room) {
+    room = await Room.create({
+      participants,
+    })
 
+    isNew = true
+  }
+
+  room = await room.populate([
+    { path: 'participants', select: '-password' },
+    { path: 'groupAdmin', select: '-password' },
+    { path: 'lastMessage', populate: { path: 'sender', select: '-password' } },
+  ])
+
+  return { room, isNew }
+}
+
+export const findRoomByParticipants = async (participants: string[]) => {
+  return await Room.findOne({
+    participants: { $all: participants },
+  }).populate([
+    { path: 'participants', select: '-password' },
+    { path: 'groupAdmin', select: '-password' },
+    { path: 'lastMessage', populate: { path: 'sender', select: '-password' } },
+  ])
+}
+
+export const findParticipantRooms = async (userId: string) => {
+  return await Room.find({
+    participants: userId,
+  })
+    .populate([
+      { path: 'participants', select: '-password' },
+      { path: 'groupAdmin', select: '-password' },
+      {
+        path: 'lastMessage',
+        populate: { path: 'sender', select: '-password' },
+      },
+    ])
+    .sort({ updatedAt: -1 })
+}
 
 // const rooms = await Room.aggregate([
 //   {

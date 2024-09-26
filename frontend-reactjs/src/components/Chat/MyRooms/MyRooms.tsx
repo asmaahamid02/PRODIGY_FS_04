@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import RoomItem from '../RoomItem'
 import NewChatModal from '../../modals/NewChatModal'
-import useGetRooms from '../../../hooks/useGetRooms'
-import { useChatContext } from '../../../hooks/useChatContext'
+import useGetRooms from '../../../hooks/requests/useGetRooms'
+import { useChatContext } from '../../../hooks/context/useChatContext'
 import SearchInput from '../../inputs/SearchInput'
-import { useModalContext } from '../../../hooks/useModalContext'
+import { useModalContext } from '../../../hooks/context/useModalContext'
 import RoomsHeader from '../RoomsHeader'
 
 const MyRooms = () => {

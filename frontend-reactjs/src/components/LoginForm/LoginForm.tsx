@@ -5,7 +5,7 @@ import TextInput from '../inputs/TextInput'
 import { FaKey, FaUser } from 'react-icons/fa'
 import PasswordAdornment from '../utils/PasswordAdornment'
 import { ILoginFormValues } from '../../types/login.type'
-import useLogin from '../../hooks/useLogin'
+import useLogin from '../../hooks/requests/useLogin'
 
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),

@@ -4,23 +4,23 @@ import authRoutes from './routes/auth.route'
 import roomRoutes from './routes/room.route'
 import messageRoutes from './routes/message.route'
 import userRoutes from './routes/user.route'
-import connectToMongoDB from './database/mongodb.database'
+import connectToDB from './config/db.config'
 import cookieParser from 'cookie-parser'
-import { IUserBasicInfo } from './types/user.type'
+import { IUser } from './types/user.type'
 import cors from 'cors'
-import { app, server } from './socket'
+import { app, server } from './config/socket.config'
 import path from 'path'
+import { getErrorMessage } from './utils/error.util'
 
 dotenv.config()
 
 const port = process.env.PORT || 8000
-
 const BASEDIR = path.resolve()
 
 //add user property to Request interface
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: IUserBasicInfo | null
+    user?: IUser | null
   }
 }
 
@@ -43,7 +43,14 @@ app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.join(BASEDIR, 'frontend-reactjs', 'dist', 'index.html'))
 })
 
-server.listen(port, () => {
-  connectToMongoDB()
-  console.log(`Server is running at port ${port}`)
-})
+connectToDB()
+  .then(() => {
+    console.log('Connected to MongoDB successfully!')
+
+    server.listen(port, async () => {
+      console.log(`Server is running at port ${port}`)
+    })
+  })
+  .catch((error) =>
+    console.log(getErrorMessage(error, 'Failed to connect to MongoDB!'))
+  )

@@ -5,6 +5,7 @@ interface IAvatarProps {
   alt: string
   width?: string
   isOnline?: boolean
+  displayOnline?: boolean
 }
 
 const Avatar: FC<IAvatarProps> = ({
@@ -12,9 +13,14 @@ const Avatar: FC<IAvatarProps> = ({
   src,
   alt,
   isOnline = false,
+  displayOnline = false,
 }) => {
   return (
-    <div className={`avatar ${isOnline ? 'online' : 'offline'}`}>
+    <div
+      className={`shrink-0 avatar ${
+        isOnline ? 'online' : displayOnline ? 'offline' : ''
+      }`}
+    >
       <div className={`rounded-full ${width}`}>
         <img src={src} alt={alt} />
       </div>

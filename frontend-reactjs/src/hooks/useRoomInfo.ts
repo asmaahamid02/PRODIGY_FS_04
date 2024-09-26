@@ -1,13 +1,8 @@
 import { IRoom } from '../types/chat.type'
-import { useChatContext } from './useChatContext'
-import { useAuthContext } from './useAuthContext'
-import {
-  formateDate,
-  formateDateToHoursAndMinutes,
-  isToday,
-  isYesterday,
-} from '../utils/date.util'
-import { useSocketContext } from './useSocketContext'
+import { useChatContext } from './context/useChatContext'
+import { useAuthContext } from './context/useAuthContext'
+import { formatDate } from '../utils/date.util'
+import { useSocketContext } from './context/useSocketContext'
 
 interface IRoomInfoProps {
   room: IRoom
@@ -32,17 +27,14 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
   const lastMessageText = lastMessage?.message
     ? lastMessage.message
     : 'No messages yet'
-  let lastMessageTime = lastMessage?.createdAt as string
-  lastMessageTime = isYesterday(lastMessageTime)
-    ? 'Yesterday'
-    : isToday(lastMessageTime)
-    ? formateDateToHoursAndMinutes(lastMessageTime)
-    : formateDate(lastMessageTime)
+  const lastMessageTime = formatDate(lastMessage?.createdAt as string)
   const isLastMessageSentByMe = lastMessage?.sender?._id === authUser?._id
 
   //check if last message is read by the user
   const isLastMessageRead =
-    lastMessage?.sender._id === authUser?._id || selectedRoom?._id === room?._id
+    !lastMessage ||
+    lastMessage?.sender._id === authUser?._id ||
+    selectedRoom?._id === room?._id
       ? true
       : lastMessage?.readBy?.some((item) => item.reader === authUser?._id)
 
@@ -60,13 +52,11 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
     ? room.participants.find((user) => user._id === typingInfo?.userId)
     : null
 
-  //get unread messages count
-  const unreadCount = room?.unreadCount
-
   return {
     sender,
     chatName,
     isGroup,
+    lastMessage,
     lastMessageText,
     lastMessageTime,
     profilePicture,
@@ -74,7 +64,6 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
     isOnline,
     typing: typing && typingInfo?.roomId === room._id,
     typingUser,
-    unreadCount,
     isLastMessageRead,
     isLastMessageSentByMe,
   }

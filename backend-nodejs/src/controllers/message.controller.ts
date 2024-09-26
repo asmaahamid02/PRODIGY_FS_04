@@ -1,92 +1,65 @@
 import { Request, Response } from 'express'
 import { getErrorMessage } from '../utils/error.util'
 import { validateRequiredFields } from '../utils/validation.util'
-import { notifyReceiver } from '../services/socket.service'
 import {
-  createMessage,
-  getTotalUnreadMessages,
   populateMessageForResponse,
-  updateMessageReadStatus,
+  updateMessageReaders,
+  updateRoomLastMessage,
 } from '../services/message.service'
-import { findOrCreateRoom } from '../services/room.service'
+import { findRoomById } from '../services/room.service'
+import Message from '../models/message.model'
+import {
+  notifyRoomParticipants,
+  notifyUsersOutsideRoom,
+} from '../services/notification.service'
 
 export const sendMessage = async (req: Request, res: Response) => {
   try {
-    const validateRequiredFieldsResponse = validateRequiredFields(req.body, [
-      'message',
-    ])
-
-    if (!validateRequiredFieldsResponse.valid) {
-      return res
-        .status(400)
-        .json({ error: validateRequiredFieldsResponse.message })
-    }
+    validateRequiredFields(req.body, ['message'])
 
     const { message }: { message: string } = req.body
-    const receiverId = req.params.receiverId
+    const roomId = req.params.roomId
     const senderId = req.user?._id
 
-    if (!receiverId || !senderId) {
-      return res.status(400).json({ error: 'Participant Id is required!' })
+    if (!senderId || !roomId) {
+      return res.status(400).json({ error: 'Room Id is required!' })
     }
 
     // Find or create room
-    let room = await findOrCreateRoom(senderId.toString(), receiverId)
+    const room = await findRoomById(roomId)
     if (!room) {
-      return res.status(404).json({ error: 'Room not found or created!' })
+      return res.status(404).json({ error: 'Room not found' })
     }
-    const isNewRoom = !room.lastMessage
 
     // Create and send message
-    const newMessage = await createMessage(
-      senderId.toString(),
+    const newMessage = await Message.create({
+      sender: senderId,
       message,
-      room._id.toString()
-    )
+      room: room._id.toString(),
+    })
+
     if (!newMessage) {
       return res.status(500).json({ error: 'Failed to send message!' })
     }
 
     // Update read status for the users in the room
-    await updateMessageReadStatus(
+    await updateMessageReaders(
       room._id.toString(),
       senderId.toString(),
       newMessage
     )
 
     // Update room's last message
-    room.lastMessage = newMessage._id
-    room.updatedAt = new Date()
-    await Promise.all([room.save(), newMessage.save()])
+    await updateRoomLastMessage(room, newMessage)
 
     // Populate necessary fields for the response
     await populateMessageForResponse(newMessage)
 
-    // Notify receiver about new room or message
-    if (isNewRoom) {
-      room = await room.populate([
-        { path: 'groupAdmin', select: '-password' },
-        { path: 'participants', select: '-password' },
-        {
-          path: 'lastMessage',
-          populate: { path: 'sender', select: '-password' },
-        },
-      ])
+    // Send message to the room participants
+    await notifyRoomParticipants(room, senderId.toString(), newMessage)
 
-      notifyReceiver(receiverId, 'roomCreated', room)
-    }
-
-    room.participants.forEach((participant) => {
-      if (participant._id.toString() === senderId.toString()) {
-        return
-      }
-
-      notifyReceiver(participant._id.toString(), 'messageReceived', newMessage)
-    })
-
-    //notify receiver about unread messages count
-    const totalUnreadMessages = await getTotalUnreadMessages(receiverId)
-    notifyReceiver(receiverId, 'unreadMessagesCount', totalUnreadMessages)
+    //send notifications to the users who are not in the room
+    await notifyUsersOutsideRoom(room)
 
     return res.status(201).json(newMessage)
   } catch (error) {

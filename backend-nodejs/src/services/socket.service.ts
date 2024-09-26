@@ -1,4 +1,4 @@
-import { getReceiverSocketId, io } from '../socket'
+import { getReceiverSocketId, io } from '../config/socket.config'
 export const notifyReceiver = (
   receiverId: string,
   event: string,
@@ -14,4 +14,19 @@ export const notifyReceiver = (
       `Event: ${event} emitted to User ID: ${receiverId} with Socket ID: ${receiverSocketId}`
     )
   }
+}
+
+export const getUsersJoinedRoom = (roomId: string): string[] => {
+  const users: string[] = []
+  const socketIdsJoinedRoom = io.sockets.adapter.rooms.get(roomId)
+
+  if (socketIdsJoinedRoom) {
+    socketIdsJoinedRoom.forEach((socketId) => {
+      const userId = io.sockets.sockets.get(socketId)?.handshake.query
+        .userId as string
+      users.push(userId)
+    })
+  }
+
+  return users
 }

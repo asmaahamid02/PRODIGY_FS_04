@@ -1,15 +1,15 @@
 import './index.css'
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5'
-import { useChatContext } from '../../../hooks/useChatContext'
-import useGetMessages from '../../../hooks/useGetMessages'
+import { useChatContext } from '../../../hooks/context/useChatContext'
 import Spinner from '../../utils/Spinner'
 import ChatHeader from '../ChatHeader'
 import ChatMessages from '../ChatMessages'
 import SendMessage from '../SendMessage'
+import useGetMessages from '../../../hooks/requests/useGetMessages'
 
 const ChatBox = () => {
-  const { selectedRoom } = useChatContext()
-  const { loading } = useGetMessages()
+  const { selectedRoom, loadingMessages } = useChatContext()
+  useGetMessages()
 
   return (
     <div
@@ -23,7 +23,7 @@ const ChatBox = () => {
           <ChatHeader />
 
           {/* CHAT BODY */}
-          {loading ? (
+          {loadingMessages ? (
             <div className='flex-1 flex justify-center items-center'>
               <Spinner />
             </div>

@@ -1,7 +1,7 @@
-const Spinner = ({ size = 'h-16' }: { size?: string }) => {
+const Spinner = ({ size = 'loading-lg' }: { size?: string }) => {
   return (
-    <div className={`flex justify-center items-center ${size}`}>
-      <span className='loading loading-ring loading-lg'></span>
+    <div className={`flex justify-center items-center`}>
+      <span className={`loading loading-ring  ${size}`}></span>
     </div>
   )
 }

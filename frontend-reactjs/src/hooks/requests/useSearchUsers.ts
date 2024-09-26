@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { IUser } from '../types/user.type'
-import { handleError } from '../utils/error.util'
-import { searchUsersService } from '../services/user.service'
+import { IUser } from '../../types/user.type'
+import { handleError } from '../../utils/error.util'
+import { searchUsersService } from '../../services/user.service'
 
 const useSearchUsers = () => {
   const [loading, setLoading] = useState(false)

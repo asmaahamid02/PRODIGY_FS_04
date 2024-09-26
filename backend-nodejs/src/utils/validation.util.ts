@@ -1,18 +1,27 @@
-// Utility function to check for required fields
-//eslint-disable-next-line
-export const checkRequiredFields = (body: any, fields: string[]): string[] =>
-  fields.filter((field) => !body[field])
-
 //eslint-disable-next-line
 export const validateRequiredFields = (body: any, fields: string[]) => {
-  const missingFields = checkRequiredFields(body, fields)
-
-  if (missingFields.length > 0) {
-    return {
-      valid: false,
-      message: `The following fields are required: ${missingFields.join(', ')}`,
+  fields.forEach((field) => {
+    if (!body[field]) {
+      throw new Error(`${field} is required`)
     }
+  })
+}
+
+//eslint-disable-next-line
+export const validateGroupRequest = (data: any, requiredFields: string[]) => {
+  const { name, users } = data
+
+  requiredFields.forEach((field) => {
+    if (!data[field]) {
+      throw new Error(`${field} is required`)
+    }
+  })
+
+  if (name.trim().length < 3) {
+    throw new Error('Group name must be at least 3 characters')
   }
 
-  return { valid: true, message: '' }
+  if (!users || users.length < 2) {
+    throw new Error('Group must have at least 2 users')
+  }
 }

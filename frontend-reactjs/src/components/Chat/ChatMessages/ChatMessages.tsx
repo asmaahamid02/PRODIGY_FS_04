@@ -1,6 +1,6 @@
 import ScrollableFeed from 'react-scrollable-feed'
-import { useChatContext } from '../../../hooks/useChatContext'
-import { useAuthContext } from '../../../hooks/useAuthContext'
+import { useChatContext } from '../../../hooks/context/useChatContext'
+import { useAuthContext } from '../../../hooks/context/useAuthContext'
 import { useMemo } from 'react'
 import { isLastMessage, isSameSender } from '../../../utils/chat.util'
 import ChatBubble from '../ChatBubble'

@@ -2,7 +2,8 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import { IRoom } from '../types/room.type'
-import { getTotalUnreadMessages } from '../services/message.service'
+import { getNotificationsQuery } from '../services/notification.service'
+import { notifyReceiver } from '../services/socket.service'
 
 const app = express()
 
@@ -35,6 +36,25 @@ io.on('connection', async (socket) => {
   // Online Users
   io.emit('getOnlineUsers', Array.from(userSocketMap.keys()))
 
+  //join room
+  socket.on('joinRoom', (roomId: string) => {
+    socket.join(roomId)
+
+    console.log(`User with Session ID: ${socket.id} joined Room ID: ${roomId}`)
+    ;(socket as unknown as { roomId: string }).roomId = roomId
+  })
+
+  //update room
+  socket.on('updateRoom', (room: IRoom) => {
+    room.participants.forEach((participant) => {
+      if (participant._id.toString() === userId) {
+        return
+      }
+
+      notifyReceiver(participant._id.toString(), 'roomUpdated', room)
+    })
+  })
+
   //typing
   socket.on('typing', (room: IRoom) => {
     room.participants.forEach((participant) => {
@@ -42,12 +62,10 @@ io.on('connection', async (socket) => {
         return
       }
 
-      const receiverSocketId = getReceiverSocketId(
-        participant._id.toString()
-      ) as string
-      socket
-        .in(receiverSocketId)
-        .emit('typingReceived', { roomId: room._id.toString(), userId })
+      notifyReceiver(participant._id.toString(), 'typingReceived', {
+        roomId: room._id.toString(),
+        userId,
+      })
     })
   })
 
@@ -57,26 +75,16 @@ io.on('connection', async (socket) => {
         return
       }
 
-      const receiverSocketId = getReceiverSocketId(
-        participant._id.toString()
-      ) as string
-      socket
-        .in(receiverSocketId)
-        .emit('stopTypingReceived', { roomId: room._id.toString(), userId })
+      notifyReceiver(participant._id.toString(), 'stopTypingReceived', {
+        roomId: room._id.toString(),
+        userId,
+      })
     })
   })
 
-  // total unread messages
-  const totalUnreadMessages = await getTotalUnreadMessages(userId)
-  io.to(socket.id).emit('unreadMessagesCount', totalUnreadMessages)
-
-  //join room
-  socket.on('joinRoom', (roomId: string) => {
-    socket.join(roomId)
-
-    console.log(`User with Session ID: ${socket.id} joined Room ID: ${roomId}`)
-    ;(socket as unknown as { roomId: string }).roomId = roomId
-  })
+  //notifications
+  const notifications = await getNotificationsQuery(userId)
+  io.to(socket.id).emit('getNotifications', notifications)
 
   socket.on('disconnect', () => {
     console.log(`User with Session ID: ${socket.id} disconnected!`)

@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import { IMessage } from '../../../types/chat.type'
-import { formateDateTime } from '../../../utils/date.util'
-
+import moment from 'moment'
 interface IMessageProp extends IMessage {
   isMe: boolean
   isSameSender: boolean
@@ -46,7 +45,7 @@ const ChatBubble: FC<IChatBubbleProps> = ({ message }) => {
 
       {/* TIME */}
       <div className='chat-footer opacity-50'>
-        {formateDateTime(message.createdAt)}
+        {moment(message.createdAt).calendar()}
       </div>
     </div>
   )

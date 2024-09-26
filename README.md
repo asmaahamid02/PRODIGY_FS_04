@@ -19,8 +19,9 @@ Connectify is a real-time Chat App that allows users to connect with friends, fa
 
 > [Live Demo](https://connectify-gd98.onrender.com)
 
-<img src='./readme/chat-app-demo-1.gif' alt='Chat App Demo' width="100%" />
+<img src='./readme/chat-app-demo-1.gif' alt='Chat App Demo' width="100%"/>
 <img src='./readme/chat-app-demo-2.gif' alt='Chat App Demo' width="100%"/>
+<img src='./readme/chat-app-demo-3.gif' alt='Chat App Demo' width="100%"/>
 
 ## Requirements
 
@@ -30,9 +31,10 @@ Connectify is a real-time Chat App that allows users to connect with friends, fa
 ## Features
 
 - Registration and authentication
+- One-to-one messaging
+- Group messaging
 - Real-time messaging
-- Real-time total unread messages count
-- Real-time room unread messages count
+- Real-time notifications
 - Real-time online/offline status
 - Typing Indicators
 - Search users & rooms
