@@ -12,7 +12,7 @@ import {
   fetchRoomMessages,
 } from '../services/message.service'
 import { IGroupRequest } from '../types/room.type'
-import { validateRequiredFields } from '../utils/validation.util'
+import { validateGroupRequest } from '../utils/validation.util'
 import Room from '../models/room.model'
 export const getRooms = async (req: Request, res: Response) => {
   try {
@@ -115,37 +115,19 @@ export const getRoom = async (req: Request, res: Response) => {
 
 export const createGroup = async (req: Request, res: Response) => {
   try {
-    const validateRequiredFieldsResponse = validateRequiredFields(req.body, [
-      'name',
-    ])
-
-    if (!validateRequiredFieldsResponse.valid) {
-      return res
-        .status(400)
-        .json({ error: validateRequiredFieldsResponse.message })
-    }
-
-    const userId = req.user?._id
     const { name, users }: IGroupRequest = req.body
+    const userId = req.user?._id
 
-    if (name.trim().length < 3) {
-      return res
-        .status(400)
-        .json({ error: 'Group name must be at least 3 characters' })
-    }
-
-    if (!users || users.length < 2) {
-      return res.status(400).json({ error: 'Group must have at least 2 users' })
-    }
+    validateGroupRequest(req.body, ['name', 'users'])
 
     const foundUsers = await User.find({ _id: { $in: users } }).select('_id')
 
-    if (!foundUsers) {
+    if (!foundUsers.length) {
       return res.status(400).json({ error: 'No valid users found!' })
     }
 
     let room = await Room.create({
-      groupName: name,
+      groupName: name.trim(),
       participants: [userId, ...foundUsers],
       isGroup: true,
       groupAdmin: userId,
@@ -161,11 +143,9 @@ export const createGroup = async (req: Request, res: Response) => {
     ])
 
     room.participants.forEach((participant) => {
-      if (participant._id.toString() === userId?.toString()) {
-        return
+      if (participant._id.toString() !== userId?.toString()) {
+        notifyReceiver(participant._id.toString(), 'newRoom', room)
       }
-
-      notifyReceiver(participant._id.toString(), 'newRoom', room)
     })
 
     return res.status(201).send(room)
@@ -179,44 +159,25 @@ export const createGroup = async (req: Request, res: Response) => {
 
 export const updateGroup = async (req: Request, res: Response) => {
   try {
-    const validateRequiredFieldsResponse = validateRequiredFields(req.body, [
-      'name',
-    ])
-
-    if (!validateRequiredFieldsResponse.valid) {
-      return res
-        .status(400)
-        .json({ error: validateRequiredFieldsResponse.message })
-    }
-
+    const { name, users }: IGroupRequest = req.body
     const userId = req.user?._id
     const roomId = req.params.roomId
-    const { name, users }: IGroupRequest = req.body
 
     if (!roomId || !userId) {
       res.status(400).json({ error: 'roomId is required!' })
     }
 
-    if (name.trim().length < 3) {
-      return res
-        .status(400)
-        .json({ error: 'Group name must be at least 3 characters' })
-    }
-
-    if (!users || users.length < 2) {
-      return res.status(400).json({ error: 'Group must have at least 2 users' })
-    }
+    validateGroupRequest(req.body, ['name', 'users'])
 
     const foundUsers = await User.find({ _id: { $in: users } }).select('_id')
-
-    if (!foundUsers) {
+    if (!foundUsers.length) {
       return res.status(400).json({ error: 'No valid users found!' })
     }
 
     const room = await Room.findByIdAndUpdate(
       roomId,
       {
-        $set: { participants: [userId, ...foundUsers], groupName: name },
+        $set: { participants: [userId, ...foundUsers], groupName: name.trim() },
       },
       { new: true }
     ).populate([
@@ -233,11 +194,9 @@ export const updateGroup = async (req: Request, res: Response) => {
     }
 
     room.participants.forEach((participant) => {
-      if (participant._id.toString() === userId?.toString()) {
-        return
+      if (participant._id.toString() !== userId?.toString()) {
+        notifyReceiver(participant._id.toString(), 'newRoom', room)
       }
-
-      notifyReceiver(participant._id.toString(), 'newRoom', room)
     })
 
     return res.status(201).send(room)

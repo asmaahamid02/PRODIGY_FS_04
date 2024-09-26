@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { sendMessageService } from '../../services/message.service'
 import { useChatContext } from '../context/useChatContext'
 import { useSocketContext } from '../context/useSocketContext'
+import { handleError } from '../../utils/error.util'
 
 const useSendMessage = () => {
   const [loading, setLoading] = useState(false)
@@ -24,7 +25,7 @@ const useSendMessage = () => {
       //update messages array
       setMessages((prevMessages) => [...prevMessages, response])
     } catch (error: unknown) {
-      console.log(error)
+      handleError(error, 'Error in useSendMessage ~ sendMessage')
     } finally {
       setLoading(false)
     }

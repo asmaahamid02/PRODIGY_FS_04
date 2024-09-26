@@ -10,14 +10,12 @@ const useNotificationListener = () => {
 
   useEffect(() => {
     socket?.on('getNotifications', (notifications: IRoom[]) => {
-      console.log('notifications', notifications)
       setNotifications(notifications)
     })
   }, [socket, setNotifications])
 
   useEffect(() => {
     socket?.on('newNotifications', (notifications: IRoom[]) => {
-      console.log('newNotifications', notifications)
       setNotifications(notifications)
     })
   }, [socket, setNotifications])

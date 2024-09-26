@@ -52,8 +52,6 @@ const useRoomInfo = ({ room }: IRoomInfoProps) => {
     ? room.participants.find((user) => user._id === typingInfo?.userId)
     : null
 
-  console.log('typingInfo', typingInfo)
-  console.log('selectedRoom', selectedRoom)
   return {
     sender,
     chatName,

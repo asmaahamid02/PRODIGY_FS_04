@@ -15,15 +15,7 @@ import {
 
 export const sendMessage = async (req: Request, res: Response) => {
   try {
-    const validateRequiredFieldsResponse = validateRequiredFields(req.body, [
-      'message',
-    ])
-
-    if (!validateRequiredFieldsResponse.valid) {
-      return res
-        .status(400)
-        .json({ error: validateRequiredFieldsResponse.message })
-    }
+    validateRequiredFields(req.body, ['message'])
 
     const { message }: { message: string } = req.body
     const roomId = req.params.roomId
@@ -74,9 +66,6 @@ export const sendMessage = async (req: Request, res: Response) => {
     console.log(
       getErrorMessage(error, 'Error in Message Controller - SendMessage API')
     )
-    if (error instanceof Error) {
-      console.log(error.stack)
-    }
     return res.status(500).json({ error: 'Internal Server Error!' })
   }
 }

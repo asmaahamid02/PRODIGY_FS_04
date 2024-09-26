@@ -6,6 +6,7 @@ import {
 } from '../../services/room.service'
 import { useSocketContext } from '../context/useSocketContext'
 import toast from 'react-hot-toast'
+import { handleError } from '../../utils/error.util'
 
 const useGroupRequests = () => {
   const [loading, setLoading] = useState(false)
@@ -26,7 +27,7 @@ const useGroupRequests = () => {
       socket?.emit('joinRoom', response._id)
       toast.success('Group created successfully')
     } catch (error: unknown) {
-      console.log(error)
+      handleError(error, 'Error in useGroupRequests ~ createGroup')
     } finally {
       setLoading(false)
     }
@@ -54,7 +55,7 @@ const useGroupRequests = () => {
       socket?.emit('updateRoom', response)
       toast.success('Group updated successfully')
     } catch (error: unknown) {
-      console.log(error)
+      handleError(error, 'Error in useGroupRequests ~ updateGroup')
     } finally {
       setLoading(false)
     }

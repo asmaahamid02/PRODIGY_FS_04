@@ -2,6 +2,7 @@ import { useSocketContext } from '../context/useSocketContext'
 import { useEffect } from 'react'
 import { useChatContext } from '../context/useChatContext'
 import { getMessagesService } from '../../services/room.service'
+import { handleError } from '../../utils/error.util'
 
 const useGetMessages = () => {
   const { selectedRoom, setMessages, setRooms, setLoadingMessages } =
@@ -33,7 +34,7 @@ const useGetMessages = () => {
 
         setMessages(response)
       } catch (error: unknown) {
-        console.log(error)
+        handleError(error, 'Error in useGetMessages ~ fetchMessages')
       } finally {
         if (setLoadingMessages) setLoadingMessages(false)
       }
