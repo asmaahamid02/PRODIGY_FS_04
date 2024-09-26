@@ -230,7 +230,7 @@ export const leaveGroup = async (req: Request, res: Response) => {
     //if there is no participant left in the group, delete the room
     if (room.participants.length === 1) {
       await Room.findByIdAndDelete(roomId)
-      return res.status(200).json({ message: 'Room deleted successfully!' })
+      return res.status(200).json({ deleted: true})
     }
 
     let roomAdmin = room.groupAdmin?.toString()

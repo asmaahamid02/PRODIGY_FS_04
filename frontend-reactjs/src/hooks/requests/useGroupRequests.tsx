@@ -73,8 +73,15 @@ const useGroupRequests = () => {
 
       setRooms((prev) => prev.filter((room) => room._id !== roomId))
       setSelectedRoom(null)
-      socket?.emit('updateRoom', response)
+
       toast.success('Group left successfully')
+
+      //if the room is deleted, no need to update the room
+      if ('deleted' in response && response.deleted) {
+        return
+      }
+
+      socket?.emit('updateRoom', response)
     } catch (error: unknown) {
       handleError(error, 'Error in useGroupRequests ~ leaveGroup')
     } finally {

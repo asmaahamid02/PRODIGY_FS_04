@@ -71,6 +71,9 @@ export const leaveGroupService = async (
   | {
       error: string
     }
+  | {
+      deleted: boolean
+    }
 > => {
   const response = await api.post(
     `${API_ENDPOINTS.ROOMS}/group/${roomId}/leave`
