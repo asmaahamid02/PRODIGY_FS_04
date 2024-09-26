@@ -19,28 +19,34 @@ const SendMessage = () => {
   const handleSendMessage = async () => {
     if (message.trim() === '' || loadingMessages) return
 
-    await sendMessage(selectedRoom?._id as string, message)
+    await sendMessage(selectedRoom?._id as string, message.trim())
     setMessage('')
   }
 
-  const handleTyping = useCallback(
-    (text: string) => {
-      setMessage(text)
+  const handleTyping = (text: string) => {
+    setMessage(text)
 
-      if (!isTyping) {
-        setIsTyping(true)
+    if (!isTyping) {
+      setIsTyping(true)
+    }
+  }
 
-        socket?.emit('typing', selectedRoom)
+  //handle typing events
+  useEffect(() => {
+    if (isTyping && selectedRoom && socket) {
+      socket.emit('typing', selectedRoom)
 
-        setTimeout(() => {
-          socket?.emit('stopTyping', selectedRoom)
-          setIsTyping(false)
-        }, 3000)
-      }
-    },
-    [isTyping, selectedRoom, socket]
-  )
+      const timeout = setTimeout(() => {
+        socket.emit('stopTyping', selectedRoom)
+        setIsTyping(false)
+      }, 3000)
 
+      // Clean up the timeout when the component unmounts or dependencies change
+      return () => clearTimeout(timeout)
+    }
+  }, [isTyping, selectedRoom, socket])
+
+  //reset message and typing state when room changes
   useEffect(() => {
     if (selectedRoom) {
       setIsTyping(false)
